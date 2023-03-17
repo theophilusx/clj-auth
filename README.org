@@ -1,0 +1,94 @@
+* clj-auth
+
+An exmaple of using Clojure and ClojureScript to implement a JWT based authentication and
+authorisation system for a web application.
+
+** Purpose
+
+A very basic repository demonstrating an implementation of a JWT based authentication
+solution using Clojure and ClojureScript. This is more an example application rather than
+a library. However, it seems that 90% of what is required to implement a JWT based
+authentication and authorisation solution already exists with existing Clojure and
+ClojureScript libraries. What is really going on here is just some glue or scaffolding to
+put it all together. As such, this is probably a reasonable example of what you need to do
+in your own applications to add an authentication and application layer.  
+
+The main goal here is to have a basic reference implementation for a JWT based
+authentication and authorisation solution which I can use in applications I implement
+using Clojure and ClojureScript. The reality is that while most applications I have
+implemented have a requirement for authentication and authorisation, I typically
+re-implement this functionality every time. My life would become significantly better if I
+could just grab a reference implementation to add to my applications and be done with
+it. An additional benefit is it would also provide consistency across the applications I
+develop and maintain. In simple terms, I'm implementing an authn/authz module to myh
+toolbox which I can add to applications I develop in a consistent and standardised manner.
+
+*** Secondary Goal
+
+One of the things I love most about Clojure/ClojureScript is the preference towards
+composing your stack from individual libraries rather than simply using an existing
+framework where you primarily just fill in various templates and write basic boilerplate
+code. I like the composition approach because it tends to mean I understand both the
+technology and the libraries being used and when things go wrong or need to be
+extewnded/chagned, I have full control. The downside of this approach is that initially,
+it can be extremely daunting when deciding what libraries to use. THis is partly due to
+not having deep familiarityh with the various libraries. In many cases, you cannot fully
+understand the benefits of one library over another until you have used it to solve some
+real problems. Often, you find yourself in the uncomfortable position of wondering if you
+have made the right choice or spending too much time swapping libraries in and out and
+failing to make real progress on the actual problem you want to solve.
+
+A secondary goal for this repository is to provide an environment for experimenting with
+various Clojure and ClojureScript libraries. The authn/authz space provides a fairly well
+defined set of requirements which also tend to touch much of the functionality you would
+typically encounter in a web based application. As such, it likely provides a good
+application for evaluating various libraries and techniques. This means this repository
+will evolve over time. While the overall functionality the repository implements may not
+change, how that functionality is implemented and associated dependencies will change.
+
+** Requirements
+
+The basic functionality I would expect to see in a basic auth module would include
+
+- Secure
+
+  - OWASP aware/compliant.
+
+  - Appropriate hashing and signing support
+
+  - Secure token generation, forgery protection and validation
+
+- Account/Identity registration
+
+  - Unique identity key
+
+  - Email address
+
+  - Username (optional)
+
+  - Display name(s) (optional)
+    
+- Basic authentication services
+
+  - Single factor password based authentication
+
+    - Minimum password length enforcement.
+
+    - Support/encourage pass pharases over passwords 
+
+  - 2FA support (optional)
+
+    - Security Key
+
+    - Authy (or similar)
+
+- Secure forgotten password service
+
+  - Support initial password setting
+
+- Secure change password service
+
+- Account/identity Deletion service
+
+- Aauthorisation/Role support
+
