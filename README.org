@@ -92,3 +92,40 @@ The basic functionality I would expect to see in a basic auth module would inclu
 
 - Aauthorisation/Role support
 
+* Technology Stack
+
+As this repository is also a test bed for experimenting and testing various Clojure and
+ClojureScript libraries, the technology and libraries being used is likely to evolve over
+time. Once all core functionality has been implemented with the initial technology stack, a
+tag will be added to the repository which will identify that /completed/ version. This also
+means that the head of the repository will frequently represent a /work in progress/ state
+of teh repository rather than a stable working implementation of the key
+functionality. Use at your own risk!
+
+** Initial Version
+
+Initially, this repository will be based on the following libraries. In general, these
+libraries have been chosen either because they are well known and provide a basic generic
+service of low interest (e.g. Jetty adaptor) or because they look interesting and I want
+ot get some /hands on/ experience with them (e.g. reitit, integrant) or because they are
+currently the best supported library providing specific functionality with few or no
+altgernatives (e.g. buddy). 
+
+- [[https://github.com/weavejester/integrant][Integrant]] :: Used to manage the startup, reloading and halting of the system. 
+
+- [[https://clojars.org/ring/ring-jetty-adapter][Ring's Jetty Adaptor]] :: Provides the basic http server functionality.
+
+- [[https://github.com/metosin/reitit][Reitit Router]] :: Basic Clojure and ClojureScript data driven routing
+
+- [[https://github.com/ptaoussanis/timbre][Timbre Logging]] :: A pure Clojure/ClojureScript logging framework
+
+- [[https://github.com/seancorfield/next-jdbc][Next JDBC]] :: Clojure JDBC library. Using Postgresql as the back end database
+
+= [[https://github.com/seancorfield/honeysql][Honey SQL]] :: SQL as Clojure data structures
+
+- [[https://github.com/yogthos/migratus][Migratus]] :: Database migration support
+
+- [[https://github.com/funcool/buddy][Buddy]]  :: Security library used for hashing and signing etc.
+
+  
+ 
