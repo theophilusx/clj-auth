@@ -2,11 +2,13 @@
   (:require [integrant.core :as ig]
             [ring.adapter.jetty :refer [run-jetty]]
             [next.jdbc :as jdbc]
+            [next.jdbc.connection :as connection]
             [migratus.core :as migratus]
             [taoensso.timbre :refer [debug info merge-config!]]
             [taoensso.timbre.appenders.core :refer [spit-appender]]
             [theophilusx.auth.handlers :refer [app]])
-  (:import [java.sql Connection SQLException]))
+  (:import [java.sql Connection SQLException]
+           (com.mchange.v2.c3p0 ComboPooledDataSource PooledDataSource)))
 
 (def config
   "The integrant system config map"
@@ -17,9 +19,11 @@
   (atom {}))
 
 (defmethod ig/init-key :theophilusx.auth.system/logging [_ {:keys [log-file]}]
+  (debug "Enabling logg9ing")
   (merge-config! {:appenders {:spit (spit-appender {:fname log-file})}}))
 
 (defmethod ig/halt-key! :theophilusx.auth.system/logging [_ _]
+  (debug "Disabling logging")
   (merge-config! {:appenders {:spit {:enabled? false}}}))
 
 (defmethod ig/init-key :theophilusx.auth.system/site-handler [_ _]
@@ -36,12 +40,12 @@
 
 (defmethod ig/init-key :theophilusx.auth.system/database [_ db]
   (debug (str "Database config: " db))
-  (debug "Creating DB connection")
-  (jdbc/get-datasource db))
+  (connection/->pool ComboPooledDataSource db))
 
 (defmethod ig/init-key :theophilusx.auth.system/migration[_ config]
+  (debug "Configure migratus")
+  (debug (str "Migration config: " config))
   (let [c (assoc-in config [:db :connection] (jdbc/get-connection (:data-source config)))]
-    (debug "Migration Init")
     (debug (str "Migratus Config: " c))
     (migratus/migrate c)
     config))
@@ -68,3 +72,9 @@
   (reset! system {}))
 
 
+(comment
+  (:theophilusx.auth.system/database @config)
+  @system 
+  (let [ds (connection/->pool ComboPooledDataSource (:theophilusx.auth.system/database @config))]
+    (jdbc/execute! ds ["select 'Hello' as test"]))
+  )
