@@ -13,3 +13,6 @@ pom.xml.asc
 .nrepl-port
 .cpcache/
 .env.edn
+.clj-kondo
+.lsp
+.rebel_readline_history
