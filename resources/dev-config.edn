@@ -1,21 +1,19 @@
-{:theophilusx.auth.system/logging
+{:theophilusx.auth.log/logger
  {:log-file "auth-dev.log"}
- :theophilusx.auth.system/site-handler
+ :theophilusx.auth.routes/site-handler
  {}
- :theophilusx.auth.system/web-server
+ :theophilusx.auth.core/web-server
  {:port 3000
   :join? false
-  :handler #ig/ref :theophilusx.auth.system/site-handler}
- :theophilusx.auth.system/database
+  :handler #ig/ref :theophilusx.auth.routes/site-handler}
+ :theophilusx.auth.db/data-source
  {:dbtype "postgres"
   :subprotocol "postgresql"
   :subname "postgres"
-  :user "auth"
-  :password "devel"
   :dbname "devel"}
- :theophilusx.auth.system/migration
+ :theophilusx.auth.migrate/migration
  {:store :database
   :migration-dir "migrations/"
   :migration-table-name "auth_migrations"
   :rollback? true
-  :data-source #ig/ref :theophilusx.auth.system/database}}
+  :db #ig/ref :theophilusx.auth.db/data-source}}
