@@ -36,4 +36,7 @@
     (reset! system (start-system cfg))))
 
 (comment
+  (-main)
+  (stop-system @system)
+  (log/debug @system)
   )

@@ -1,1 +1,2 @@
 truncate table auth.users;
+

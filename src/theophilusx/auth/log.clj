@@ -7,6 +7,6 @@
   (log/debug "Enabling logg9ing")
   (log/merge-config! {:appenders {:spit (spit-appender {:fname log-file})}}))
 
-(defmethod ig/halt-key! :theophilusx.auth.log/logger [_ _]
-  (log/debug "Disabling logging")
-  (log/merge-config! {:appenders {:spit {:enabled? false}}}))
+;; (defmethod ig/halt-key! :theophilusx.auth.log/logger [_ _]
+;;   (log/debug "Disabling logging")
+;;   (log/merge-config! {:appenders {:spit {:enabled? false}}}))

@@ -14,6 +14,6 @@
  :theophilusx.auth.migrate/migration
  {:store :database
   :migration-dir "migrations/"
-  :migration-table-name "auth_migrations"
+  :migration-table-name "auth.auth_migrations"
   :rollback? true
   :db #ig/ref :theophilusx.auth.db/data-source}}
