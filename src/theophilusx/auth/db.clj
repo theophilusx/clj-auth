@@ -12,16 +12,11 @@
 
 (def database (atom nil))
 
-(defmethod ig/prep-key :theophilusx.auth.db/data-source [_ config]
-  (log/debug (str "data-source: Prepare key config = " config))
-  (let [e (read-env "resources/.env.edn")]
-    (merge {:user (:db-user e) :password (:db-password e)} config)))
-
 (defmethod ig/init-key :theophilusx.auth.db/data-source [_ config]
   (let [e (read-env "resources/.env.edn")
         c (merge {:user (:db-user e) :password (:db-password e)} config)]
     (log/debug (str "data-source: Init connection pool. config = " config))
-    (reset! database (connection/->pool ComboPooledDataSource config))
+    (reset! database (connection/->pool ComboPooledDataSource c))
     c))
   
 (defmethod ig/halt-key! :theophilusx.auth.db/data-source [_ _]
@@ -90,5 +85,28 @@
       (get-user email)
       rslt)))
 
+(defn add-confirm-record
+  "Setup an account confirmation record."
+  [email id & {:keys [modified-by] :or {modified-by "system"}}]
+  (let [sql (sql/format {:insert-into [:auth.confirm]
+                         :columns [:confirm_id :email :created_by]
+                         :values [[id email modified-by]]})]
+    (execute-one sql)))
+
+(defn set-confirm-flag
+  "Set is_confirmed value for `id`. The `ip` is the client IP."
+  [id ip & {:keys [modified_by] :or {modified_by "system"}}]
+  (let [sql (sql/format {:update :auth.confirm
+                         :set {:is_confirmed true
+                               :verified_dt [:current_timestamp]
+                               :verified_ip ip
+                               :verified_by modified_by}
+                         :where [:= :confirm_id id]})]
+    (execute-one sql)))
+
 (comment
+  (sql/format {:update :auth.confirm
+               :set {:confirm_id true
+                     :modified_dt [:current_timestamp]}
+               :where [:= :confirm_id  "22"]})
   )
