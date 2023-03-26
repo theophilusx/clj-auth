@@ -26,8 +26,8 @@
                          :get not-implemented-handler}]
               ["/register" {:name ::register
                             :post {:parameters {:body {:email s/Str
-                                                       :first_name s/Str
-                                                       :last_name s/Str
+                                                       :first-name s/Str
+                                                       :last-name s/Str
                                                        :password s/Str}}
                                    :handler register-handler}}]
               ["/update" {:name ::update

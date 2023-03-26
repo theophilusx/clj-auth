@@ -27,3 +27,9 @@
                          " " user))
               {:db-status :error
                :error-msg "Unexpected failure"}))))
+
+(defn get-confirm-message
+  "Setup a confirm URL and return a confirm message."
+  [email]
+  (let [confirm-id (random-uuid)]
+    ))
