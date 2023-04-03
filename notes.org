@@ -1,0 +1,47 @@
+#+TITLE: Notes
+
+Various developer notes put here so we don't forget.
+
+* Error Codes
+
+Using simple keywords for different error classification at this point. May change this
+later. Tracking names/meaning here
+
+- :db-access :: Error accessing the database
+- :db-error :: Generic database access error
+- :duplicate-id :: An identity with the same identifier (email address) already exists.
+
+* Terms
+
+There are a number of terms used within the identity and access management space which are
+used inconsistently or which may have different inherent meanings to some. This list
+defines what is meant by these terms within *this* project.
+
+- 2FA :: Two factor authentication. Describes an /authn/ process which requires to distinct
+  factors in order to verify an identity. For example, a password and a hardware key or
+  fingerprint etc.
+  
+- authn :: The authentication process. Establishing an identity is who they say they are.
+
+- authz :: The authorisation process. Determining what an authenticated identityh is
+  allowed to do or access.
+
+- identity :: The base object. Most often, this is an individual (a user), but it could
+  just as easily be a group. An identify must have a way to identify themselves i.e. a
+  passsword for single factor /authn/ or maybe a password and a token for multi-factor
+  authn.
+
+- hash :: A function, which when applied to an input value, will return a new value which
+  is guaranteed to be unique to the input value and which is guaranteed to always be the
+  same given the same input value, but which cannot be reversed to determine the input
+  value. Typically used for secure password storage. 
+  
+- OTP :: One time password. A password which can only be used once.
+  
+- password :: A secret only known to an identity. 
+
+- TOTP :: Timed one time password. A single use password which must be used within a
+  specified time period i.e. 60 seconds.
+
+
+
