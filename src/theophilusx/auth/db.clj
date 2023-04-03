@@ -39,7 +39,10 @@
     (catch SQLException e
       (log/debug (str "execute: Error = " (.getMessage e)))
       {:db-status :error
-       :error-msg (.getMessage e)})))
+       :error-msg (.getMessage e)
+       :error-code (.getErrorCode e)
+       :error-state (.getSQLState e)
+       :result nil})))
 
 (defn execute-one
   "Execute an SQL statement, expecting a single row result. Returns a map with
@@ -57,7 +60,10 @@
     (catch SQLException e
       (log/debug (str "execute-one: Error = " (.getMessage e)))
       {:db-status :error
-       :error-msg (.getMessage e)})))
+       :error-msg (.getMessage e)
+       :error-code (.getErrorCode e)
+       :error-state (.getSQLState e)
+       :result nil})))
 
 (defn connection-ok?
   "Simple test of database connection."
@@ -65,7 +71,7 @@
   (let [rslt (execute-one (sql/format {:select [["Hello" :test]]}))]
     (= (get-in rslt [:result :test]) "Hello")))
 
-(defn get-user
+(defn get-id
   "Retrieve a user record based on email primary key."
   [email]
   (let [sql (sql/format {:select [:*]
@@ -73,25 +79,30 @@
                          :where [:= :email email]})]
     (execute-one sql)))
 
-(defn add-user
+(defn delete-id [email]
+  (let [sql (sql/format {:delete-from :auth.users
+                         :where [:= :email email]})]
+    (execute-one sql)))
+
+(defn add-id
   "Create a new user record."
   [email first-name last-name password & {:keys [modified-by] :or {modified-by "system"}}]
   (let [sql (sql/format {:insert-into [:auth.users]
                          :columns [:email :first_name :last_name :password :created_by :modified_by]
                          :values [[email first-name last-name password modified-by modified-by]]})
         rslt (execute-one sql)]
-    (if (and (= :ok (:db-status rslt))
-             (= (get-in rslt [:result :update-count]) 1))
-      (get-user email)
-      rslt)))
+    (log/info "add-id: email = " email "result = " rslt)
+    rslt))
 
 (defn add-confirm-record
   "Setup an account confirmation record."
   [email id & {:keys [modified-by] :or {modified-by "system"}}]
   (let [sql (sql/format {:insert-into [:auth.confirm]
                          :columns [:confirm_id :email :created_by]
-                         :values [[id email modified-by]]})]
-    (execute-one sql)))
+                         :values [[id email modified-by]]})
+        rslt (execute-one sql)]
+    (log/info "add-confirm-record: Result = " rslt)
+    rslt))
 
 (defn set-confirm-flag
   "Set is_confirmed value for `id`. The `ip` is the client IP."
@@ -105,8 +116,8 @@
     (execute-one sql)))
 
 (comment
-  (sql/format {:update :auth.confirm
-               :set {:confirm_id true
-                     :modified_dt [:current_timestamp]}
-               :where [:= :confirm_id  "22"]})
+  (get-id "john@example.com")
+  (add-id "bongo@ongo.com" "Bongo" "Ongo" "ongo bongo")
+(sql/format {:delete-from :auth.users
+                         :where [:= :email "fred"]})
   )
