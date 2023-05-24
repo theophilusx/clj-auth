@@ -28,3 +28,13 @@
   (debug "Resetting system")
   (reset)
   (reset! system rstate/system))
+
+(comment
+  (defn my-play [v]
+    (condp re-matches v
+      #"^00.*$" {:status :match1 :value v}
+      #"^01.*$" {:status :match2 :value v}
+      #"^02.*$" {:status :match3 :value v}
+      {:status :generic-match :value v}))
+  (my-play "0400")
+  )

@@ -4,6 +4,7 @@ create type auth.status as enum (
   , 'locked'
   , 'contact'
   , 'ok'
+  , 'archived'
 );
 --;;
 create table if not exists auth.users (
