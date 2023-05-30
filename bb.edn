@@ -1,0 +1,24 @@
+{:paths ["scripts"]
+ :tasks
+ {nrepl {:requires ([babashka.fs :as fs]
+                    [babashka.nrepl.server :as srv])
+         :task (do (srv/start-server! {:host "localhost"
+                                       :port 1339})
+                   (spit ".nrepl-port" "1339")
+                   (-> (Runtime/getRuntime)
+                       (.addShutdownHook
+                        (Thread. (fn [] (fs/delete ".nrepl-port")))))
+                   (deref (promise)))}
+  pgpass {:requires ([auth.core :as c]
+                     [babashka.fs :as fs])
+          :doc "Re-build Postgres .pgpass file"
+          :task (do (c/make-pgpasswd "resources/.env.edn")
+                    (println "Updated .pgpass file"))}
+  build-db {:requires ([auth.core :as c])
+            :doc "Build the database"
+            :task (do (c/build-db "resources/.env.edn")
+                      (println "Re-built auth database"))}
+  destroy-db {:requires ([auth.core :as c])
+              :doc "Erase auth database"
+              :task (do (c/destroy-db "resources/.env.edn")
+                        (println "Erased auth database"))}}}
