@@ -2,6 +2,80 @@
 
 Various developer notes put here so we don't forget.
 
+* System Configuration
+
+Two configuration files are used to define build and run tasks for this module. These
+configuration files are located in the ~resources~ sub-directory. The first file is
+~./resources/dev-config.edn~. This file is stored in git and does ot contain any sensitive
+information. It contains basic configuration options for the library. Once you move into a
+production situation, you would generate a ~prod-config.edn~ copy which you would then edit
+to match your production configuration.
+
+The second configuraiton file is ~./resources/.env.edn~. This file does contain sensitive
+information, such as passwords. It is not and should not, be stored in git. This file has
+the following entries
+
+#+begin_example
+{:db-user "auth"
+ :db-password "XXXXX"
+ :db-name "devel"
+ :db-host "localhost"
+ :db-port 5432
+ :db-password-file ".pgpass"
+ :db-script-path "resources/db"
+ :smtp-server "smtp.example.com"
+ :smtp-port 587
+ :smtp-tls true
+ :smtp-user "user@example.com"
+ :smtp-password "XXXXXXX"
+ :smtp-from "\"Auth System\" <user@example.com>"
+ :smtp-dev-address "\"Auth Dev Address\" <dev@example.com>"
+ :config-file "resources/dev-config.edn"}
+#+end_example
+
+* Database Setup
+
+The software uses PostgreSQL as a backend database store. This is the process used to
+create the DB.
+
+- Create database using psql e.g.
+
+  : sudo -u postgres psql
+
+- Create a user and database for use as credential storage source e.g.
+
+  #+begin_example
+  postgres=# CREATE USER auth WITH PASSWORD 'xxxx';
+  postgres=# CREATE DATABASE devel;
+  #+end_example
+
+Once the database and user have been defined, the rest of the setup and configuration is
+managed via /Babashka/ script tasks. Note that the babashka scripts use the configuration
+files outlined above. It is important to update these files to suit your local setup
+before attempting to use the babashka scripts. 
+To see a complete list of /Babashka/ tasks, run
+
+  : bb tasks
+
+The first script to run is
+
+  : bb run pgpass
+
+This will create a .pgpass password file int he root of the project repository. This file
+is used by Postgres client tools such as pgsql.
+
+If you change the password being used by the library database user e.g. ~auth~ by default,
+you need to update the ~./resources/.env.edn~ file and re-run ~bb run pgpass~ to update the
+.pgpass file.
+
+To build the database, run
+
+  : bb run build-db
+
+To destroy the database (in case you want to re-build a clean versions), run
+
+  : bb run destroy-db
+
 * Error Codes
 
 Using simple keywords for different error classification at this point. May change this
