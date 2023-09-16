@@ -10,10 +10,6 @@
  :theophilusx.auth.db/data-source
  {:dbtype "postgres"
   :subprotocol "postgresql"
-  :subname "postgres"
-  :dbname "devel"}
+  :subname "postgres"}
  :theophilusx.auth.mail/post
- {:smtp-server "smtp.gmail.com"
-  :smtp-port 587
-  :smtp-tls true
-  :env :dev}}
+ {:env :dev}}
