@@ -142,6 +142,36 @@
         (is (= "-1" (:error-code rslt)))
         (is (nil? (:result rslt)))))))
 
+(deftest get-confirm-record
+  (let [email "test@example.com"
+        vid "test-id"
+        r1 (sut/add-confirm-record email vid)]
+    (testing "Get known confirmation record"
+      (is (= :ok (:status r1)))
+      (let [r2 (sut/get-confirm-record email vid)]
+        (is (map? r2))
+        (is (contains? r2 :status))
+        (is (contains? r2 :result))
+        (is (= :ok (:status r2)))
+        (is (map? (:result r2)))
+        (is (= email (get-in r2 [:result :email])))
+        (is (= vid (get-in r2 [:result :confirm_id])))
+        (is (not (get-in r2 [:result :is_confirmed])))))
+    (testing "Handle unknown confirmation record Pt 1."
+      (let [r2 (sut/get-confirm-record email "no-such-id")]
+        (is (map? r2))
+        (is (contains? r2 :status))
+        (is (contains? r2 :result))
+        (is (= :ok (:status r2)))
+        (is (nil? (:result r2)))))
+    (testing "Handle unknown confirmation record Pt 2."
+      (let [r2 (sut/get-confirm-record "nobody@nowhere.com" vid)]
+        (is (map? r2))
+        (is (contains? r2 :status))
+        (is (contains? r2 :result))
+        (is (= :ok (:status r2)))
+        (is (nil? (:result r2)))))))
+
 (defn clear-ids []
   (sut/delete-id "fred@example.com")
   (sut/truncate-table "auth.confirm"))
@@ -152,4 +182,5 @@
   (add-id)
   (delete-id)
   (add-confirm-record)
-  (set-confirm-flag))
+  (set-confirm-flag)
+  (get-confirm-record))

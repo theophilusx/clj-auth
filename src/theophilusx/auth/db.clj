@@ -250,6 +250,7 @@
          :error-msg (.getMessage e)
          :error-name (:error error-data)
          :error-code (:value error-data)
+         :sql sql
          :result nil}))))
 
 (defn execute-one
@@ -272,6 +273,7 @@
          :error-msg (.getMessage e)
          :error-name (:error error-data)
          :error-code (:value error-data)
+         :sql sql
          :result nil}))))
 
 (defn connection-ok?
@@ -349,7 +351,19 @@
        :result nil}
       rslt)))
 
-(comment)
+(defn get-confirm-record
+  "Retrieve the confirm record for email."
+  [email vid]
+  (let [sql (-> (h/select :*)
+                (h/from :auth.confirm)
+                (h/where [:= :email email]
+                         [:= :confirm_id (str vid)])
+                (sql/format))
+        rslt (execute-one sql)]
+    rslt))
+
+(comment
+  )
 
 
 
