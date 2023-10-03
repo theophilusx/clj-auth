@@ -59,6 +59,7 @@
 (deftest delete-id
   (testing "Delete existing ID"
     (let [rslt (sut/delete-id "fred@example.com")]
+      (println (str "Result = " rslt))
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -73,10 +74,10 @@
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
       (is (nil? (:result rslt))))))
-      
+
 (deftest add-confirm-record
   (let [id (random-uuid)
-        email "fred@example.com"]
+        email "john@example.com"]
     (testing "Add new confirmation record"
       (let [rslt (sut/add-confirm-record email id)]
         (is (map? rslt))
@@ -110,7 +111,7 @@
 
 (deftest set-confirm-flag
   (let [id1 (random-uuid)
-        email "fred@example.com"
+        email "john@example.com"
         ip "192.168.1.1"]
     (testing "Set confirmation flag"
       (let [r1 (sut/add-confirm-record email id1)]
@@ -143,7 +144,7 @@
         (is (nil? (:result rslt)))))))
 
 (deftest get-confirm-record
-  (let [email "test@example.com"
+  (let [email "john@example.com"
         vid "test-id"
         r1 (sut/add-confirm-record email vid)]
     (testing "Get known confirmation record"

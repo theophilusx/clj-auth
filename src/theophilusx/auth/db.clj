@@ -244,7 +244,7 @@
       {:status :ok
        :result rslt})
     (catch SQLException e
-      (log/debug (str "execute: Error = " (.getMessage e)))
+      (log/error (str "execute: Error = " (.getMessage e)))
       (let [error-data (error-state->code (.getSQLState e))]
         {:status :error
          :error-msg (.getMessage e)
@@ -267,7 +267,7 @@
       {:status :ok
        :result rslt})
     (catch SQLException e
-      (log/debug (str "execute-one: Error = " (.getMessage e)))
+      (log/error (str "execute-one: Error = " (.getMessage e)))
       (let [error-data (error-state->code (.getSQLState e))]
         {:status :error
          :error-msg (.getMessage e)
@@ -303,11 +303,16 @@
       rslt)))
 
 (defn delete-id [email]
-  (let [sql (sql/format {:delete-from :auth.users
-                         :where [:= :email email]})
-        rslt (execute-one sql)]
-    (log/debug (str "delete-id: Result = " rslt))
-    rslt))
+  (let [sql1 (-> (h/delete-from :auth.confirm)
+                 (h/where [:= :email email])
+                 (sql/format))
+        sql2 (-> (h/delete-from :auth.users)
+                 (h/where [:= :email email])
+                 (sql/format))
+        rslt1 (execute-one sql1)
+        rslt2 (execute-one sql2)]
+    (log/debug (str "delete-id: Result 1: " rslt1 " Result 2: " rslt2))
+    rslt2))
 
 (defn add-id
   "Create a new user record."
@@ -362,8 +367,8 @@
         rslt (execute-one sql)]
     rslt))
 
-(comment
-  )
+(comment)
+
 
 
 
