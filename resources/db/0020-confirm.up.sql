@@ -1,6 +1,6 @@
 create table if not exists auth.confirm (
   confirm_id varchar(64) primary key
-  , email varchar(100) not null
+  , email varchar(100) references auth.users(email)
   , is_confirmed boolean default false
   , created_by varchar(100) not null
   , created_dt timestamp default current_timestamp
