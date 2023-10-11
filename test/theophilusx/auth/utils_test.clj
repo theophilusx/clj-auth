@@ -4,7 +4,7 @@
             [clojure.string :refer [blank?]]))
 
 (deftest read-env
-  (let [env-file "resources/.env.edn"
+  (let [env-file "resources/dev-env.edn"
         env-keys #{:db-user :db-password :db-name :db-host :db-port :db-password-file
                    :db-script-path :smtp-server :smtp-port :smtp-tls :smtp-user :smtp-password
                    :smtp-from :smtp-dev-address :config-file}]
@@ -15,6 +15,27 @@
     (testing "fail to read non-existent envrionment file"
       (let [ev (sut/read-env "resources/does-not-exist.edn")]
         (is (nil? ev))))))
+
+(deftest read-config
+  (let [env-file "resources/dev-env.edn"
+        env-data (sut/read-env env-file)
+        cfg-keys #{:theophilusx.auth.log/logger
+                   :theophilusx.auth.routes/site
+                   :theophilusx.auth.core/web-server
+                   :theophilusx.auth.db/data-source
+                   :theophilusx.auth.mail/post}]
+    (testing "Successfully read system config"
+      (let [cfg (sut/read-config env-data)]
+        (is (map? cfg))
+        (is (= cfg-keys (set (keys cfg))))
+        (let [db-cfg (:theophilusx.auth.db/data-source cfg)
+              db-keys #{:user :password :dbname
+                        :dbtype :subprotocol :subname}]
+          (is (map? db-cfg))
+          (is (= db-keys (set (keys db-cfg)))))))
+    (testing "Handle non-existent config file gracefuly"
+      (let [cfg (sut/read-config {:config-file "does-not-exist"})]
+        (is (nil? cfg))))))
 
 (deftest map->str
   (let [m {:key1 "value1"

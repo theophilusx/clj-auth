@@ -2,7 +2,8 @@
   (:require [clojure.edn :as edn]
             [clojure.string :refer [join]]
             [taoensso.timbre :as log]
-            [buddy.hashers :as hashers]))
+            [buddy.hashers :as hashers]
+            [integrant.core :as ig]))
 
 (defn read-env
   "Load .env.edn file of envrionment specific settings."
@@ -12,6 +13,31 @@
     (edn/read-string (slurp env-file))
     (catch Exception e
       (log/error (str "read-env: " (.getMessage e)))
+      nil)))
+
+(defn read-config
+  "Load the integrant system config file."
+  [env-data]
+  (try 
+    (log/debug (str "Reading config file: " (:config-file env-data)))
+    (let [cfg (ig/read-string (slurp (:config-file env-data)))
+          db-cfg (merge  {:user (:db-user env-data)
+                          :password (:db-password env-data)
+                          :dbname (:db-name env-data)}
+                         (:theophilusx.auth.db/data-source cfg))
+          mail-cfg (merge  {:host (:smtp-server env-data)
+                            :port (:smtp-port env-data)
+                            :tls (:smtp-tls env-data)
+                            :user (:smtp-user env-data)
+                            :pass (:smtp-password env-data)
+                            :dev-address (:smtp-dev-address env-data)
+                            :from-address (:smtp-from env-data)}
+                           (:theophilusx.auth.maail/post cfg))]
+      (merge cfg {:theophilusx.auth.db/data-source db-cfg
+                  :theophilusx.auth.mail/post mail-cfg})
+      )
+    (catch Exception e
+      (log/error "read-config: " (.getMessage e))
       nil)))
 
 (defn map->str
