@@ -1,5 +1,5 @@
 (ns theophilusx.auth.core
-  (:require [theophilusx.auth.utils :refer [read-env]]
+  (:require [theophilusx.auth.utils :refer [read-env read-config]]
             [taoensso.timbre :as log]
             [integrant.core :as ig]
             [ring.adapter.jetty :refer [run-jetty]]))
@@ -15,12 +15,6 @@
 (def config (atom nil))
 (def system (atom nil))
 
-(defn read-config
-  "Load the integrant system config file."
-  [config-file]
-  (log/debug (str "Reading config file: " config-file))
-  (ig/read-string (slurp config-file)))
-
 (defn start-system [config]
   (log/info "Starting system")
   (ig/init config))
@@ -30,13 +24,12 @@
   (ig/halt! system))
 
 (defn -main []
-  (let [e (read-env "resources/.env.edn")
-        cfg (read-config (:config-file e))]
+  (let [env-data (read-env "resources/dev-env.edn")
+        cfg (read-config env-data)]
     (reset! config cfg)
     (reset! system (start-system cfg))))
 
 (comment
   (-main)
   (stop-system @system)
-  (log/debug @system)
-  )
+  (log/debug @system))

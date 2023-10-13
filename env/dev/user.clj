@@ -29,7 +29,10 @@
   (reset! system rstate/system))
 
 (comment
-  (start-system))
+  (start-system)
+  (let [env-data (read-env "resources/dev-env.edn")
+        cfg (read-config env-data)]
+    (reset! config cfg)))
 
 
 

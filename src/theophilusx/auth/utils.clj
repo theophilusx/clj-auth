@@ -32,10 +32,9 @@
                             :pass (:smtp-password env-data)
                             :dev-address (:smtp-dev-address env-data)
                             :from-address (:smtp-from env-data)}
-                           (:theophilusx.auth.maail/post cfg))]
+                           (:theophilusx.auth.mail/post cfg))]
       (merge cfg {:theophilusx.auth.db/data-source db-cfg
-                  :theophilusx.auth.mail/post mail-cfg})
-      )
+                  :theophilusx.auth.mail/post mail-cfg}))
     (catch Exception e
       (log/error "read-config: " (.getMessage e))
       nil)))
@@ -62,3 +61,6 @@
   if the stored version of the password should be updated."
   [supplied-pwd recorded-pwd]
   (hashers/verify supplied-pwd recorded-pwd))
+
+(comment
+  (let [e-data ]))
