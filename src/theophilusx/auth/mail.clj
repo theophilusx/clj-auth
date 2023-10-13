@@ -2,7 +2,6 @@
   (:require [postal.core :as post]
             [integrant.core :as ig]
             [hiccup.page :refer [html5]]
-            [theophilusx.auth.utils :refer [read-env]]
             [taoensso.timbre :as log]))
 
 (def smtp-server (atom {}))
@@ -14,17 +13,17 @@
 (def dev-address (atom "no-reply@bogus.site"))
 
 (defmethod ig/init-key :theophilusx.auth.mail/post [_ config]
-  (let [e (read-env "resources/.env.edn")
-        svr {:host (:smtp-server e)
-             :port (:smtp-port e)
-             :tls (:smtp-tls e)
-             :user (:smtp-user e)
-             :pass (:smtp-password e)}]
+  (let [svr {:host (:host config)
+             :port (:port config)
+             :tls (:tls config)
+             :user (:user config)
+             :pass (:pass config)}]
     (when (= :prod (:env config))
       (reset! mail-environment :prod))
-    (reset! dev-address (:smtp-dev-address e))
-    (reset! smtp-from (:smtp-from e))
-    (reset! smtp-server svr)))
+    (reset! dev-address (:dev-address config))
+    (reset! smtp-from (:from-address config))
+    (reset! smtp-server svr)
+    config))
 
 (defn confirm-msg
   "Create a confirmation message map with supplied confirm link."
