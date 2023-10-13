@@ -5,7 +5,6 @@
             [honey.sql :as sql]
             [honey.sql.helpers :as h]
             [taoensso.timbre :as log]
-            [theophilusx.auth.utils :refer [read-env]]
             [integrant.core :as ig])
   (:import [java.sql SQLException]
            (com.mchange.v2.c3p0 ComboPooledDataSource)))
@@ -13,11 +12,9 @@
 (def database (atom nil))
 
 (defmethod ig/init-key :theophilusx.auth.db/data-source [_ config]
-  (let [e (read-env "resources/.env.edn")
-        c (merge {:user (:db-user e) :password (:db-password e) :dbname (:db-name e)} config)]
-    (log/debug (str "data-source: Init connection pool. config = " config))
-    (reset! database (connection/->pool ComboPooledDataSource c))
-    c))
+  (log/debug (str "data-source: Init connection pool. config = " config))
+  (reset! database (connection/->pool ComboPooledDataSource config))
+  config)
 
 (defmethod ig/halt-key! :theophilusx.auth.db/data-source [_ _]
   (log/debug "data-source: Closing connection pool")
