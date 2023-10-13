@@ -1,35 +1,48 @@
 (ns theophilusx.auth.actions
-  (:require [buddy.hashers :as hashers]
-            [taoensso.timbre :as log]
-            [taoensso.timbre :refer [debug info]]
-            [theophilusx.auth.db :as db]))
+  (:require [taoensso.timbre :as log]
+            [theophilusx.auth.db :as db]
+            [theophilusx.auth.mail :as mail]
+            [theophilusx.auth.utils :as utils]))
 
-(defn register-user
-  "Register a new user."
-  [email first-name last-name password]
-  (let [user (db/get-user email)]
-    (cond
-      (and (= :ok (:db-status user))
-           (nil? (:result user))) (let [pwd (hashers/derive (or password (random-uuid)) {:alg :bcrypt+blake2b-512})
-                                        rslt (db/add-user email first-name last-name pwd)]
-                                    (info (str "register-user: Added " email))
-                                    rslt)
-      (= :error (:db-status user)) (do
-                                     (info (str "register-user: Failed to registger " email " " user))
-                                     user)
-      (not (nil? (:result user))) (do
-                                    (info (str "register-user: Failed to register "
-                                               email ". Already registered"))
-                                    {:db-status :exists
-                                     :error-msg (str "Identity " email " already registered")})
-      :else (do
-              (info (str "register-user: Unknown failure registering " email
-                         " " user))
-              {:db-status :error
-               :error-msg "Unexpected failure"}))))
-
-(defn get-confirm-message
-  "Setup a confirm URL and return a confirm message."
+(defn create-verify-record
+  "Create a new verification record for give email address and insert it into db."
   [email]
-  (let [confirm-id (random-uuid)]
-    ))
+  (let [vid (random-uuid)
+        rslt (db/add-confirm-record email vid)]
+    (log/debug "create-verify-record " rslt)
+    (if (= :ok (:status rslt))
+      {:status :ok
+       :email email
+       :vid vid}
+      rslt)))
+
+(defn request-verify-id
+  "Generate new verification record and send emil request to verify."
+  [email]
+  (let [rslt (create-verify-record email)]
+    (if (= :ok (:status rslt))
+      (let [link (str "http://localhost/confirm/" (.toString (:vid rslt)))
+            mail-rslt (mail/send-confirm-msg email link)]
+        (log/debug "request-verify-id " mail-rslt)
+        mail-rslt)
+      rslt)))
+
+(defn create-id
+  "Create a new user."
+  [email first-name last-name password]
+  (let [pwd (utils/hash-pwd password)
+        id-rslt (db/add-id email first-name last-name pwd)]
+    (log/debug "create-id: email: " email " result: " id-rslt)
+    (if (= :ok (:status id-rslt))
+      (let [rslt (request-verify-id email)]
+        (log/debug "create-id: request-verify-id: " rslt)
+        (if (= :ok (:status rslt))
+          {:status :ok
+           :result {:email email
+                    :state :verify}}
+          rslt))
+      id-rslt)))
+
+(comment)
+
+
