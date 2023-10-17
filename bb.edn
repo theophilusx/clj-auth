@@ -24,6 +24,6 @@
               :task (do (c/destroy-db "resources/dev-env.edn")
                         (println "Erased auth database"))}
   project-repl {:doc "Run a project clojure repl"
-                :task {eval (clojure "-M:test/env:dev/env:repl/reloaded")}}
+                :task {eval (clojure "-M:test/env:dev/env:repl/proj")}}
   outdated {:doc "Find outdated dependencies"
             :task {eval (clojure "-T:search/outdated")}}}}
