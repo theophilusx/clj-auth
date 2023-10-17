@@ -1,8 +1,11 @@
 {:theophilusx.auth.log/logger
- {:log-file "auth-dev.log"}
+ {:log-file "auth-dev.log"
+  :log-level :debug}
  :theophilusx.auth.routes/site
  {:name "Default Site Name"
-  :domain-name "localhost"}
+  :domain-name "localhost:3000"
+  :web-protocol "http://"
+  :api-prefix "/api"}
  :theophilusx.auth.core/web-server
  {:port 3000
   :join? false
