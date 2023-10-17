@@ -1,0 +1,5 @@
+{:min-level [[#{"org.eclipse.jetty.*"} :error]
+             [#{"*"} :debug]]
+ :appenders {:println (println-appender {:stream :auto})}}
+
+
