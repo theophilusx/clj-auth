@@ -360,9 +360,17 @@
                 (h/from :auth.confirm)
                 (h/where [:= :email email]
                          [:= :confirm_id (str vid)])
-                (sql/format))
-        rslt (execute-one sql)]
-    rslt))
+                (sql/format))]
+    (execute-one sql)))
+
+(defn get-message
+  "Retrieve message from message table given message name."
+  [msg-name]
+  (let [sql (-> (h/select :message)
+                (h/from :auth.messages)
+                (h/where [:= :msg_name msg-name])
+                (sql/format))]
+    (execute-one sql)))
 
 (comment)
 
