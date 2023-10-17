@@ -12,11 +12,22 @@
             [schema.core :as s]
             [theophilusx.auth.handlers :refer [authn-post-handler
                                                not-implemented-handler
-                                               register-handler]]
+                                               register-handler
+                                               confirm-handler]]
             [integrant.core :as ig]
             [taoensso.timbre :as log]))
 
-(def routes [["/api"
+(def routes [["/" {:name ::root
+                   :get not-implemented-handler
+                   :post not-implemented-handler}]
+             ["/api"
+              ["/confirm/:email/:id" {:name ::confirm
+                                      :get confirm-handler}]
+              ["/recover/:id" {:name ::recover
+                               :get not-implemented-handler
+                               :post {:parameters {:body {:password s/Str
+                                                          :confirm s/Str}}
+                                      :handler not-implemented-handler}}]
               ["/authn" {:name ::authn
                          :get not-implemented-handler
                          :post {:parameters {:body {:username s/Str
@@ -48,6 +59,10 @@
                                 coerce-request-middleware
                                 coerce-response-middleware]}})))
 
-(defmethod ig/init-key :theophilusx.auth.routes/site-handler [_ _]
+(defmethod ig/init-key :theophilusx.auth.routes/site [_ config]
   (log/debug "site-handler: Configuring default site handlers")
-  #'app)
+  (assoc config :handler #'app))
+
+(comment
+  (app {:request-method :get
+        :uri "/"}))
