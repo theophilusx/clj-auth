@@ -15,10 +15,10 @@
 (defn run-db-scripts [config scripts]
   (doseq [s scripts]
     (let [cmd (str "/usr/bin/psql -U " (:db-user config)
-                    " -h " (:db-host config)
-                    " -p " (:db-port config)
-                    " -f ./" (:db-script-path config) "/" s
-                    " " (:db-name config))]
+                   " -h " (:db-host config)
+                   " -p " (:db-port config)
+                   " -f ./" (:db-script-path config) "/" s
+                   " " (:db-name config))]
       (shell {:extra-env {"PGPASSFILE" (:db-password-file config)}} cmd))))
 
 (defn build-db [config-file]
@@ -28,5 +28,5 @@
 
 (defn destroy-db [config-file]
   (let [config (utils/get-config config-file)
-        files (reverse (utils/get-file-list (:db-script-path config) "*.down.sql"))]
+        files (utils/get-file-list (:db-script-path config) "*.down.sql")]
     (run-db-scripts config files)))

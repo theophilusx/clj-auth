@@ -1,2 +1,2 @@
-truncate table auth.confirm;
+truncate table auth.roles;
 truncate table auth.users cascade;
