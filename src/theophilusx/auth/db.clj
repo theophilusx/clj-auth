@@ -2,6 +2,7 @@
   (:require [next.jdbc :as jdbc]
             [next.jdbc.result-set :as rs]
             [next.jdbc.connection :as connection]
+            [next.jdbc.types :as types]
             [honey.sql :as sql]
             [honey.sql.helpers :as h]
             [taoensso.timbre :as log]
@@ -282,68 +283,69 @@
 (defn truncate-table [table]
   (execute-one (sql/format {:truncate (keyword table)})))
 
-(defn get-id
-  "Retrieve a user record based on email primary key."
+(defn enum [val type]
+  [:cast (name val) type])
+
+(defn get-user-with-email
+  "Retrieve a user record based on email address."
   [email]
-  (let [sql (sql/format {:select [:*]
-                         :from :auth.users
-                         :where [:= :email email]})
+  (let [sql (-> (h/select :*)
+                (h/from :auth.users)
+                (h/where [:= :email email])
+                (sql/format))
         rslt (execute-one sql)]
-    (log/debug (str "get-id: Result  = " rslt))
+    (log/debug (str "get-user-with-email: Result  = " rslt))
     (if (and (= :ok (:status rslt))
              (nil? (:result rslt)))
       {:status :error
-       :error-msg (str "No ID found for " email)
+       :error-msg (str "No user found for email " email)
        :error-name :not-found
        :error-code "-1"
        :result nil}
       rslt)))
 
-(defn delete-id [email]
-  (let [sql1 (-> (h/delete-from :auth.confirm)
-                 (h/where [:= :email email])
-                 (sql/format))
-        sql2 (-> (h/delete-from :auth.users)
-                 (h/where [:= :email email])
-                 (sql/format))
-        rslt1 (execute-one sql1)
-        rslt2 (execute-one sql2)]
-    (log/debug (str "delete-id: Result 1: " rslt1 " Result 2: " rslt2))
-    rslt2))
-
-(defn add-id
-  "Create a new user record."
-  [email first-name last-name password & {:keys [modified-by] :or {modified-by "system"}}]
-  (let [sql (sql/format {:insert-into [:auth.users]
-                         :columns [:email :first_name :last_name :password :created_by :modified_by]
-                         :values [[email first-name last-name password modified-by modified-by]]})
-        rslt (execute-one sql)]
-    (log/debug "add-id: email = " email " Result = " rslt)
-    rslt))
-
-(defn add-confirm-record
-  "Setup an account confirmation record."
-  [email id & {:keys [modified-by] :or {modified-by "system"}}]
-  (let [sql (sql/format {:insert-into [:auth.confirm]
-                         :columns [:confirm_id :email :created_by]
-                         :values [[id email modified-by]]})
-        rslt (execute-one sql)]
-    (log/debug "add-confirm-record: Result = " rslt)
-    rslt))
-
-(defn set-confirm-flag
-  "Set is_confirmed value for `id`. The `ip` is the client IP."
-  [id email ip & {:keys [modified_by] :or {modified_by "system"}}]
-  (let [sql (-> (h/update :auth.confirm)
-                (h/set {:is_confirmed true
-                        :verified_dt :current_timestamp
-                        :verified_ip ip
-                        :verified_by modified_by})
-                (h/where [:= :confirm_id id]
-                         [:= :email email])
+(defn get-user-with-id
+  "Get a suer record given a user_id value."
+  [user-id]
+  (let [sql (-> (h/select :*)
+                (h/from :auth.users)
+                (h/where [:= :user_id user-id])
                 (sql/format))
         rslt (execute-one sql)]
-    (log/debug "set-confirm-flag: Result = " rslt)
+    (log/debug "get-user-with-id: result = " rslt)
+    (if (and (= :ok (:status rslt))
+             (nil? (:result rslt)))
+      {:status :error
+       :error-msg (str "No user found for ID " user-id)
+       :error-name :not-found
+       :error-code "-1"
+       :result nil}
+      rslt)))
+
+
+
+(defn add-user
+  "Create a new user record."
+  [email first-name last-name password & {:keys [modified-by] :or {modified-by "system"}}]
+  (let [sql (-> (h/insert-into :auth.users)
+                (h/columns :email :first_name :last_name :password :created_by :modified_by)
+                (h/values [[email first-name last-name password modified-by modified-by]])
+                (sql/format))
+        rslt (execute-one sql)]
+    (log/debug "add-user: Result ="  rslt)
+    rslt))
+
+(defn set-user-status-with-email
+  "Set the id status for user associated with supplied email."
+  [status email & {:keys [modified-by] :or {modified-by "system"}}]
+  (let [sql (-> (h/update :auth.users)
+                (h/set {:id_status (enum status :auth.status)
+                        :modified_by modified-by
+                        :modified_dt :current_timestamp})
+                (h/where [:= :email email])
+                (sql/format))
+        rslt (execute-one sql)]
+    (log/debug "set-user-status-with-email: Result = " rslt)
     (if (and (= :ok (:status rslt))
              (nil? (:result rslt)))
       {:status :error
@@ -353,15 +355,131 @@
        :result nil}
       rslt)))
 
-(defn get-confirm-record
-  "Retrieve the confirm record for email."
-  [email vid]
+(defn set-user-status-with-id
+  "Set the id status for user associated with supplied user ID."
+  [status id & {:keys [modified-by] :or {modified-by "system"}}]
+  (let [sql (-> (h/update :auth.users)
+                (h/set {:id_status (enum status :auth.status)
+                        :modified_by modified-by
+                        :modified_dt :current_timestamp})
+                (h/where [:= :user_id id])
+                (sql/format))
+        rslt (execute-one sql)]
+    (log/debug "set-user-status-with-id: Result = " rslt)
+    (if (and (= :ok (:status rslt))
+             (nil? (:result rslt)))
+      {:status :error
+       :error-msg "No matching confirmation ID"
+       :error-name :not-found
+       :error-code "-1"
+       :result nil}
+      rslt)))
+
+(defn delete-user-with-email
+  "Delete the user account with the supplied email."
+  [email]
+  (let [sql1 (-> (h/delete-from :auth.roles)
+                 (h/using :auth.users)
+                 (h/where [:= :auth.roles.user_id :auth.users.user_id]
+                          [:= :auth.users.email email])
+                 (sql/format))
+        rslt1 (execute-one sql1)]
+    (log/debug (str "delete-user-with-email: Result 1: " rslt1))
+    (if (= :ok (:status rslt1))
+      (let [sql2 (-> (h/delete-from :auth.requests)
+                     (h/using :auth.users)
+                     (h/where [:= :auth.requests.user_id :auth.users.user_id]
+                              [:= :auth.users.email email])
+                     (sql/format))
+            rslt2 (execute-one sql2)]
+        (log/debug "delete-user-with-email: Resuilt 2: " rslt2)
+        (if (= :ok (:status rslt2))
+          (let [sql3 (-> (h/delete-from :auth.users)
+                         (h/where [:= :email email])
+                         (sql/format))
+                rslt3 (execute-one sql3)]
+            (log/debug "delete-user-with-email: Reuslt 3" rslt3)
+            rslt3)
+          rslt2))
+      rslt1)))
+
+(defn delete-user-with-id
+  "Delete the user account with the supplied user id."
+  [user-id]
+  (let [sql1 (-> (h/delete-from :auth.roles)
+                 (h/where [:= :user_id user-id])
+                 (sql/format))
+        rslt1 (execute-one sql1)]
+    (log/debug "delete-user-with-id: Result 1: " rslt1)
+    (if (= :ok (:status rslt1))
+      (let [sql2 (-> (h/delete-from :auth.requests)
+                     (h/where [:= :user_id user-id])
+                     (sql/format))
+            rslt2 (execute-one sql2)]
+        (log/debug "delete-user-with-id: Resuilt 2: " rslt2)
+        (if (= :ok (:status rslt2))
+          (let [sql3 (-> (h/delete-from :auth.users)
+                         (h/where [:= :user_id user-id])
+                         (sql/format))
+                rslt3 (execute-one sql3)]
+            (log/debug "delete-user-with-id: Result 3: " rslt3)
+            rslt3)
+          rslt2))
+      rslt1)))
+
+(defn add-request-record
+  "Add a new request record for user account given user id."
+  [user-id req-key req-type & {:keys [created-by] :or {created-by "system"}}]
+  (let [sql (-> (h/insert-into :auth.requests)
+                (h/columns :user_id :req_key :req_type :created_by)
+                (h/values [[user-id req-key req-type created-by]])
+                (sql/format))
+        rslt (execute-one sql)]
+    (log/debug "add-request-record: Result: " rslt)
+    rslt))
+
+(defn get-request-record
+  "Return the request record associated with provided user ID and key."
+  [user-id req-key]
   (let [sql (-> (h/select :*)
-                (h/from :auth.confirm)
-                (h/where [:= :email email]
-                         [:= :confirm_id (str vid)])
-                (sql/format))]
-    (execute-one sql)))
+                (h/from :auth.requests)
+                (h/where [:= :user_id user-id]
+                         [:= :req_key req-key]))
+        rslt (execute-one sql)]
+    (log/debug "get-request-record: Result =" rslt)
+    (if (and (= :ok (:status rslt))
+             (nil? (:reuslt rslt)))
+      {:status :error
+       :error-code "-1"
+       :error-name :not-found
+       :error-msg (str "No request record with user ID " user-id
+                       " and key " req-key " was found!")
+       :result nil}
+      rslt)))
+
+(defn complete-request-record
+  "Set the completion status for the request record identified by user id and request key."
+  [user-id req-key & {:keys [completed-by remote-addr] :or {complete-by "system"
+                                                            remote-addr "0.0.0.0"}}]
+  (let [sql (-> (h/update :auth.requests)
+                (h/set {:completed true
+                        :completed_dt :current_timestamp
+                        :completed_by completed-by
+                        :remote_addr remote-addr})
+                (h/where [:= :user_id user-id]
+                         [:= :req_key req-key])
+                (sql/format))
+        rslt (execute-one sql)]
+    (log/debug "complete-request-record: Result = " rslt)
+    (if (and (= :ok (:status rslt))
+             (nil? (:result rslt)))
+      {:status :error
+       :error-code "-1"
+       :error-name :not-found
+       :error-msg (str "No request record with user ID " user-id
+                       " and key " req-key " was found!")
+       :request nil}
+      rslt)))
 
 (defn get-message
   "Retrieve message from message table given message name."
@@ -372,7 +490,13 @@
                 (sql/format))]
     (execute-one sql)))
 
-(comment)
+(comment
+  (set-user-status-with-id :confirmed 2)
+  (-> (h/delete-from [:auth.roles :roles])
+      (h/using [:auth.users :users])
+      (h/where [:= :user_id :users.user_id]
+               [:= :users.email "john@example.com"])
+      (sql/format)))
 
 
 

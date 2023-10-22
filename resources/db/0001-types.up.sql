@@ -1,9 +1,8 @@
 create type auth.status as enum (
-  'verify'
-  , 'recover'
+  'unconfirmed'
+  , 'confirmed'
   , 'locked'
   , 'contact'
-  , 'ok'
   , 'archived'
 );
 
