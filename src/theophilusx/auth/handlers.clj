@@ -4,13 +4,15 @@
             [theophilusx.auth.actions :refer [create-id verify-id]]
             [theophilusx.auth.db :refer [get-message]]))
 
-(defn not-implemented-handler [req]
+(defn not-implemented [req]
   {:status 501
    :body (str "Not yet implemented\n"
               "Page " (:uri req) " functionality not yet implemented.\n"
-              (map->str req))})
+              (select-keys req [:parameters :uri :request-method
+                                :params :form-params :query-params
+                                :path-params :body-params]))})
 
-(defn authn-post-handler [req]
+(defn authn-post [req]
   (log/debug "authn-post-handler" req)
   {:status 200
    :body (merge {:title "Authn Request"
@@ -21,14 +23,11 @@
                  :uri (:uri req)}
                 (:body-params req))})
 
-(defn register-handler
+(defn create
   "Create a new user identity record."
-  [{:keys [body-params] :as req}]
-  (log/debug "register-handler: Request keys:" (keys req))
-  (let [rslt (create-id (:email body-params)
-                        (:first_name body-params)
-                        (:last_name body-params)
-                        (:password body-params))]
+  [{{{:keys [email first-name last-name password]} :body} :parameters :as req}]
+  (log/debug (str "Keys: " (keys req)))
+  (let [rslt (create-id email first-name last-name password)]
     (if (= :ok (:status rslt))
       (let [msg (get-message "verify")]
         (if (= :ok (:status msg))
@@ -39,16 +38,16 @@
       (if (= :db-unique-violation (:error-name rslt))
         {:status 400
          :body {:msg (str "There is already an existing account associted with the "
-                          "email address " (:email body-params))}}
+                          "email address " email)}}
         {:status 400
        :body {:msg (str "Failed to create new account. " (:error-msg rslt))}}))))
 
-(defn confirm-handler
+(defn confirm
   "Handler used to process new account confirmation requests."
-  [{:keys [path-params remote-addr] :as req}]
-  (log/debug "confirm-handler: Path params = " path-params)
+  [{{{:keys [user-id key]} :path} :parameters :as req}]
+  (log/debug "confirm: user-id = " user-id " key = " key)
   (log/debug "confirm-handler: Request keys = " (keys req))
-  (let [rslt (verify-id (:id path-params) (:email path-params) remote-addr)]
+  (let [rslt (verify-id user-id key (:remote-addr req))]
     (if (= :ok (:status rslt))
       {:status 200
        :body {:msg (str "Account " (get-in rslt [:result :email]) " has been verified!")}}

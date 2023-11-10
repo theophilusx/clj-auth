@@ -45,6 +45,19 @@
         (is (= :ok (:status rslt)))
         (is (= email (:email rslt)))))))
 
+(deftest request-verify-id
+  (let [email "barney@example.com"]
+    (testing "SUccessfully send ID verification message"
+      (let [rslt (sut/request-verify-id email)]
+        (is (map? rslt))
+        (is (contains? rslt :status))
+        (is (= :ok (:status rslt)))))
+    (testing "Fail to send ID verification to unknown id"
+      (let [rslt (sut/request-verify-id "unknown@someplace.com")]
+        (is (map? rslt))
+        (is (contains? rslt :status))
+        (is (= :error (:status rslt)))))))
+
 (defn clear-ids []
   (println "Clear test IDs")
   (db/delete-id "barney@example.com"))
@@ -53,6 +66,7 @@
   (println "Running test-ns-hook")
   (clear-ids)
   (create-id)
-  (create-verify-record))
+  (create-verify-record)
+  (request-verify-id))
 
 

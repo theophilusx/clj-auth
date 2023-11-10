@@ -4,9 +4,10 @@
             [integrant.core :as ig]
             [ring.adapter.jetty :refer [run-jetty]]))
 
-(defmethod ig/init-key :theophilusx.auth.core/web-server [_ {:keys [handler] :as opts}]
-  (log/debugf "Starting web server on port " (:port opts))
-  (run-jetty handler (dissoc opts :handler)))
+(defmethod ig/init-key :theophilusx.auth.core/web-server [_ {:keys [site] :as opts}]
+  (log/debug "Starting web server on port " (:port opts))
+  (log/debug "Opts = " opts)
+  (run-jetty (:handler site) (dissoc opts :site)))
 
 (defmethod ig/halt-key! :theophilusx.auth.core/web-server [_ server]
   (log/debug "Shutting down web server")

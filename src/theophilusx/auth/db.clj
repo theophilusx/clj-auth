@@ -459,7 +459,7 @@
 
 (defn complete-request-record
   "Set the completion status for the request record identified by user id and request key."
-  [user-id req-key & {:keys [completed-by remote-addr] :or {complete-by "system"
+  [user-id req-key & {:keys [completed-by remote-addr] :or {completed-by "system"
                                                             remote-addr "0.0.0.0"}}]
   (let [sql (-> (h/update :auth.requests)
                 (h/set {:completed true
