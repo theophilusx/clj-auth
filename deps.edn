@@ -13,7 +13,8 @@
         org.postgresql/postgresql {:mvn/version "42.6.0"}
         buddy/buddy-auth {:mvn/version "3.0.323"}
         buddy/buddy-hashers {:mvn/version "2.0.167"}
-        com.draines/postal {:mvn/version "2.0.5"}}
+        com.draines/postal {:mvn/version "2.0.5"}
+        prismatic/schema {:mvn/version "1.4.1"}}
  :aliases {:dev/env
            {:extra-paths ["env/dev"]
             :extra-deps {ring/ring-mock {:mvn/version "0.4.0"}
@@ -23,7 +24,7 @@
                          buddy/buddy-sign {:mvn/version "3.5.351"}}}
            :repl/proj
            {:extra-deps {nrepl/nrepl                {:mvn/version "1.0.0"}
-                         cider/cider-nrepl          {:mvn/version "0.40.0"}
+                         cider/cider-nrepl          {:mvn/version "0.43.0"}
                          com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
             :main-opts  ["-e" "(apply require clojure.main/repl-requires)"
                          "--main" "nrepl.cmdline"

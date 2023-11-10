@@ -85,6 +85,30 @@ later. Tracking names/meaning here
 - :db-error :: Generic database access error
 - :duplicate-id :: An identity with the same identifier (email address) already exists.
 
+* Return values
+
+Most of the fucntions, especially database, web and other external system
+interface functions, such as for sending mail, will return a map. This map will have a
+minimum of 2 keys, =:status= and =:result=. The =:status= key will be either =:ok=, indicating an
+OK expected return value or =:error=, indicating an error has occurred. The =:result= key will
+be either a map or nil. When =nil=, it indicates no specific value was returned. When it is
+a map, it will be a map of one or more keys which represent the data being
+returned. Precisely what keys will depend on the function and data.
+
+In addition to these two keys which will always be present (when =:status= is equal to
+=:error=, the =:result= key will be nil), additional keys are included when there is an
+error. These keys are =:error-code=, =:error-msg= and =:error-name=. These additional keys ahve
+the following defintiions:
+
+- =:error-code= :: A string representing an error code. THis is often a code taken from an
+  external source reference, such as a database error code, a remote system error code
+  etc.
+
+- =:error-name= :: A keyword which is a symbolic name for a type of error. The list of
+  defined error names is included in this file. e.g. =:not-found=.
+
+- =:error-msg= :: A string error message. Typically a message for humans!
+
 * Terms
 
 There are a number of terms used within the identity and access management space which are

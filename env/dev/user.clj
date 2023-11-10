@@ -29,6 +29,7 @@
   (reset! system rstate/system))
 
 (comment
+  (play {:body {:email "fred@home" :first-name "Fred" :last-name "Dagg"}})
   (start-system)
   (let [env-data (read-env "resources/dev-env.edn")
         cfg (read-config env-data)]
