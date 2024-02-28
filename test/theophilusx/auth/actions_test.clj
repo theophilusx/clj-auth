@@ -4,6 +4,33 @@
             [theophilusx.auth.db :as db]
             [clojure.string :refer [starts-with?]]))
 
+(deftest create-request-record
+  (testing "Successfully generate request record"
+    (let [{{:keys [user_id]} :result} (db/get-user-with-email "john@example.com")
+          rslt (sut/create-request-record user_id "confirm")]
+      (is (map? rslt))
+      (is (= :ok (:status rslt)))
+      (is (= (set (keys rslt)) #{:status :user-id :vid :type}))))
+  (testing "Fail generation of request record"
+    (let [rslt (sut/create-request-record -1 "verify")]
+      (is (map? rslt))
+      (is (= :error (:status rslt)))
+      (is (nil? (:result rslt))))))
+
+(deftest request-confirm-id
+  (let [email "john@example.com"
+        {{:keys [user_id]} :result} (db/get-user-with-email email)]
+    (testing "SUccessfully send ID verification message"
+      (let [rslt (sut/request-confirm-id email user_id)]
+        (is (map? rslt))
+        (is (contains? rslt :status))
+        (is (= :ok (:status rslt)))))
+    (testing "Fail to send ID verification to unknown id"
+      (let [rslt (sut/request-confirm-id "unknown@someplace.com" -1)]
+        (is (map? rslt))
+        (is (contains? rslt :status))
+        (is (= :error (:status rslt)))))))
+
 (deftest create-id
   (let [email "barney@example.com"
         fname "Barney"
@@ -34,39 +61,23 @@
         (is (starts-with? (:error-msg rslt)
                           "ERROR: duplicate key value violates unique constraint"))))))
 
-(deftest create-verify-record
-  (let [email "barney@example.com"]
-    (testing "Creation of verify record"
-      (let [rslt (sut/create-verify-record email)]
-        (is (map? rslt))
-        (is (contains? rslt :status))
-        (is (contains? rslt :email))
-        (is (contains? rslt :vid))
-        (is (= :ok (:status rslt)))
-        (is (= email (:email rslt)))))))
-
-(deftest request-verify-id
-  (let [email "barney@example.com"]
-    (testing "SUccessfully send ID verification message"
-      (let [rslt (sut/request-verify-id email)]
-        (is (map? rslt))
-        (is (contains? rslt :status))
-        (is (= :ok (:status rslt)))))
-    (testing "Fail to send ID verification to unknown id"
-      (let [rslt (sut/request-verify-id "unknown@someplace.com")]
-        (is (map? rslt))
-        (is (contains? rslt :status))
-        (is (= :error (:status rslt)))))))
+(deftest verify-id 
+  (testing "Successfully verify ID"
+    (let [])
+    (is (= assertion-values)))) 
 
 (defn clear-ids []
   (println "Clear test IDs")
-  (db/delete-id "barney@example.com"))
+  (db/delete-user-with-email "barney@example.com"))
 
 (defn test-ns-hook []
   (println "Running test-ns-hook")
+  (create-request-record)
+  (request-confirm-id)
   (clear-ids)
   (create-id)
-  (create-verify-record)
-  (request-verify-id))
+  ;; (create-verify-record)
+  ;; (request-verify-id)
+  )
 
 
