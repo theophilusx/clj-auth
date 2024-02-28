@@ -32,6 +32,12 @@
      :get {:parameters {:path {:user-id s/Int
                                :key s/Str}}
            :handler confirm}
+     :coercion reitit.coercion.schema/coercion}]
+   ["/authn"
+    {:name "Authenticate"
+     :post {:handler not-implemented
+            :parameters {:body {:email s/Str
+                                :password s/Str}}}
      :coercion reitit.coercion.schema/coercion}]])
 
 (def app
