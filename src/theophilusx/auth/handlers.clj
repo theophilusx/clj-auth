@@ -12,8 +12,9 @@
                                 :params :form-params :query-params
                                 :path-params :body-params]))})
 
-(defn authn-post [req]
-  (log/debug "authn-post-handler" req)
+(defn authn [{{{:keys [email password]} :body} :parameters :as req}]
+  (log/debug (str "authn: email: " email " password length: " (count password)))
+  (log/debug "authn" req)
   {:status 200
    :body (merge {:title "Authn Request"
                  :desc "An authn post handler"
