@@ -198,7 +198,6 @@
                                         "I'm a wanker")
                           [:result :user_id])
           rslt (sut/delete-user-with-id user-id)]
-      (println (str "testing delete-user-with-id result: " rslt))
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -266,6 +265,35 @@
           (is (= key (get-in rslt2 [:result :req_key])))
           (is (= "confirm" (get-in rslt2 [:result :req_type]))))))))
 
+(deftest get-open-user-requests
+  (testing "Successfully returns list of open requests for user ID"
+    (let [rslt (sut/get-open-user-requests 1)]
+      (is (map? rslt))
+      (is (= :ok (:status rslt)))
+      (is (:result rslt))
+      (is (< 0 (count (:result rslt))))))
+  (testing "Returns empty result for non-existing user ID requests"
+    (let [rslt (sut/get-open-user-requests -1)]
+      (is (map? rslt))
+      (is (= :ok (:status rslt)))
+      (is (= 0 (count (:result rslt)))))))
+
+(deftest complete-request-record
+  (testing "Complete open request record"
+    (let [{:keys [user_id req_key]} (first (:result (sut/get-open-user-requests 1)))
+          rslt (sut/complete-request-record user_id req_key)]
+      (is (map? rslt))
+      (is (= :ok (:status rslt)))
+      (is (= user_id (:user_id (:result rslt))))
+      (is (= req_key (:req_key (:result rslt))))
+      (is (:completed (:result rslt)))))
+  (testing "Completing non-existent record returns empty list"
+    (let [rslt (sut/complete-request-record -1 "bad-key")]
+      (println (str "Result: " rslt))
+      (is (map? rslt))
+      (is (= :error (:status rslt)))
+      (is (nil? (:result rslt))))))
+
 (defn clear-ids []
   (sut/delete-user-with-email "fred@example.com")
   (sut/truncate-table "auth.roles"))
@@ -280,6 +308,8 @@
   (delete-user-with-email)
   (delete-user-with-id)
   (add-request-record)
+  (get-open-user-requests)
+  (complete-request-record)
   ;; (add-confirm-record)
   ;; (set-confirm-flag)
   )

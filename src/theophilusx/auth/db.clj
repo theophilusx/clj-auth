@@ -322,8 +322,6 @@
        :result nil}
       rslt)))
 
-
-
 (defn add-user
   "Create a new user record."
   [email first-name last-name password & {:keys [modified-by] :or {modified-by "system"}}]
@@ -456,6 +454,15 @@
                        " and key " req-key " was found!")
        :result nil}
       rslt)))
+
+(defn get-open-user-requests
+  "Return list of open requests for provided user ID."
+  [user-id]
+  (let [sql (-> (h/select :*)
+                (h/from :auth.requests)
+                (h/where [:= :user_id user-id])
+                (sql/format))]
+    (execute sql)))
 
 (defn complete-request-record
   "Set the completion status for the request record identified by user id and request key."
