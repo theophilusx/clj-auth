@@ -1,5 +1,6 @@
-{:min-level [[#{"org.eclipse.jetty.*"} :error]
-             [#{"*"} :debug]]
+{:min-level [["theophilusx.*" :debug]
+             ["user" :debug]
+             [#{"*"} :info]]
  :appenders {:println (println-appender {:stream :auto})}}
 
 

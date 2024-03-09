@@ -4,10 +4,10 @@
             [taoensso.timbre.appenders.core :refer [spit-appender]]))
 
 (defmethod ig/init-key :theophilusx.auth.log/logger [_ {:keys [log-file log-level]}]
-  (tl/debug "Enabling logg9ing")
-  (tl/merge-config! {:min-level [[#{"org.eclipse.jetty.*"
-                                    "com.mchange.*"} :error]
-                                 [#{"*"} log-level]]
+  (tl/debug "Enabling logging")
+  (tl/merge-config! {:min-level [["theophilusx.*" log-level]
+                                 ["user" log-level]
+                                 [#{"*"} :info]]
                      :appenders {:spit (spit-appender {:fname log-file})}}))
 
 ;; (defmethod ig/halt-key! :theophilusx.auth.log/logger [_ _]

@@ -1,5 +1,5 @@
 (ns theophilusx.auth.core
-  (:require [theophilusx.auth.utils :refer [read-env read-config]]
+  (:require [theophilusx.auth.utils :refer [read-config]]
             [taoensso.timbre :as log]
             [integrant.core :as ig]
             [ring.adapter.jetty :refer [run-jetty]]))
@@ -25,8 +25,7 @@
   (ig/halt! system))
 
 (defn -main []
-  (let [env-data (read-env "resources/dev-env.edn")
-        cfg (read-config env-data)]
+  (let [cfg (read-config)]
     (reset! config cfg)
     (reset! system (start-system cfg))))
 

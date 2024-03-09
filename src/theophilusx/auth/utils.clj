@@ -10,55 +10,56 @@
 (def key-info (atom nil))
 
 (defmethod  ig/init-key :theophilusx.auth.utils/key
-  [_ {:keys [jwt-private-key-file jwt-public-key-file
-             jwt-passphrase jwt-key-alg] :as config}]
+  [_ {:keys                                                                                                                     [jwt-private-key-file jwt-public-key-file
+                                                                                                    jwt-passphrase jwt-key-alg] :as config}]
   (log/debug "utils/keys: config " config)
   (let [priv-key-data (if jwt-private-key-file
                         (bkeys/private-key jwt-private-key-file jwt-passphrase))
-        pub-key-data (if jwt-public-key-file
-                       (bkeys/public-key jwt-public-key-file))]
+        pub-key-data  (if jwt-public-key-file
+                        (bkeys/public-key jwt-public-key-file))]
     (reset! key-info {:private-key priv-key-data
-                      :public-key pub-key-data
-                      :alg jwt-key-alg})))
+                      :public-key  pub-key-data
+                      :alg         jwt-key-alg})))
 
-(defn read-env
-  "Load .env.edn file of envrionment specific settings."
-  [env-file]
+(defn read-edn
+  "Read an EDN data file, returning map of EDN data."
+  [edn-file]
   (try
-    (log/debug (str "read-env: env-file = " env-file))
-    (edn/read-string (slurp env-file))
+    (log/debug (str "read-edn: file = " edn-file))
+    (ig/read-string (slurp edn-file))
     (catch Exception e
-      (log/error (str "read-env: " (.getMessage e)))
-      nil)))
+      (log/error (str "read-edn: " (.getMessage e)))
+      {})))
 
 (defn read-config
   "Load the integrant system config file."
-  [env-data]
+  []
   (try 
-    (log/debug (str "Reading config file: " (:config-file env-data)))
-    (let [cfg (ig/read-string (slurp (:config-file env-data)))
-          db-cfg (merge  {:user (:db-user env-data)
-                          :password (:db-password env-data)
-                          :dbname (:db-name env-data)}
-                         (:theophilusx.auth.db/data-source cfg))
-          mail-cfg (merge  {:host (:smtp-server env-data)
-                            :port (:smtp-port env-data)
-                            :tls (:smtp-tls env-data)
-                            :user (:smtp-user env-data)
-                            :pass (:smtp-password env-data)
-                            :dev-address (:smtp-dev-address env-data)
-                            :from-address (:smtp-from env-data)}
-                           (:theophilusx.auth.mail/post cfg))
-          utils-cfg {:jwt-private-key-file (:jwt-private-key-file env-data)
-                     :jwt-public-key-file (:jwt-public-key-file env-data)
-                     :jwt-key-alg (:jwt-key-alg env-data)
-                     :jwt-passphrase (:jwt-passphrase env-data)}]
+    (log/debug (str "Reading config files from resources/"))
+    (let [lcfg      (read-edn "resources/config.local.edn")
+          cfg       (read-edn "resources/config.edn")
+          db-cfg    (merge  {:user     (:db-user lcfg)
+                             :password (:db-password lcfg)
+                             :dbname   (:db-name lcfg)}
+                            (:theophilusx.auth.db/data-source cfg))
+          mail-cfg  (merge  {:host         (:smtp-server lcfg)
+                             :port         (:smtp-port lcfg)
+                             :tls          (:smtp-tls lcfg)
+                             :user         (:smtp-user lcfg)
+                             :pass         (:smtp-password lcfg)
+                             :dev-address  (:smtp-dev-address lcfg)
+                             :from-address (:smtp-from lcfg)}
+                            (:theophilusx.auth.mail/post cfg))
+          utils-cfg {:jwt-private-key-file (:jwt-private-key-file lcfg)
+                     :jwt-public-key-file  (:jwt-public-key-file lcfg)
+                     :jwt-key-alg          (:jwt-key-alg lcfg)
+                     :jwt-passphrase       (:jwt-passphrase lcfg)}]
       (merge cfg {:theophilusx.auth.db/data-source db-cfg
-                  :theophilusx.auth.mail/post mail-cfg
-                  :theophilusx.auth.utils/key utils-cfg}))
+                  :theophilusx.auth.mail/post      mail-cfg
+                  :theophilusx.auth.utils/key      utils-cfg}))
     (catch Exception e
       (log/error "read-config: " (.getMessage e))
-      nil)))
+      {})))
 
 (defn map->str
   "Convert a map to a string."

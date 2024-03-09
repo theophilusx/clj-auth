@@ -49,6 +49,13 @@ create the DB.
   postgres=# CREATE DATABASE devel;
   #+end_example
 
+- Log into the database and create an ~auth~ schema with the auth user authorized to modify
+  it.
+
+#+begin_example
+  devel=# CREATE SCHEMA auth AUTHORIZATION auth;
+#+end_example
+
 Once the database and user have been defined, the rest of the setup and configuration is
 managed via /Babashka/ script tasks. Note that the babashka scripts use the configuration
 files outlined above. It is important to update these files to suit your local setup

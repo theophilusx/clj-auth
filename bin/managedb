@@ -1,0 +1,37 @@
+#!/usr/bin/env bb
+
+(ns managedb
+  (:require [auth.core :as c]
+            [babashka.cli :as cli]))
+
+(def cli-options {:help    {:coerce :boolean
+                            :alias  :h
+                            :desc   "This help message"}
+                  :build   {:coerce :boolean
+                            :alias  :b
+                            :desc   "Run the database build and initialisation scripts"}
+                  :destroy {:coerce :boolean
+                            :alias  :d
+                            :desc   "Destroy database and remove it from the DB server"}})
+
+(defn display-help [msg]
+  (when msg
+    (println (str "\n" msg "\n"))
+    (println (str "\t--help|-h\t" (get-in cli-options [:help :desc]) "\n"
+                  "\t--build|-b\t" (get-in cli-options [:build :desc]) "\n"
+                  "\t--destroy|-d\t" (get-in cli-options [:destroy :desc]) "\n"))))
+(try 
+  (let [opts (cli/parse-opts *command-line-args* {:spec     cli-options
+                                                  :restrict [:build :destroy :help]})]
+    (cond
+      (:help opts)               (display-help "Supported arguments are :-")
+      (not (or (:build opts)
+               (:destroy opts))) (display-help "Provide either --build or --destroy argument")
+      (:build opts)              (do (c/build-db "backend/resources/dev-env.edn")
+                                     (println "Re-built auth database"))
+      (:destroy opts)            (do (c/destroy-db "backend/resources/dev-env.edn")
+                                     (println "Erased auth database"))
+      :else                      (display-help "Please supply either --build or --destroy")))
+  (catch Exception e
+    (println (.getMessage e))))
+

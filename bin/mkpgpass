@@ -1,0 +1,8 @@
+#!/usr/bin/env bb
+
+(ns mkpgpass
+  (:require [auth.core :as c]
+            [babashka.fs :as fs]))
+
+(do (c/make-pgpasswd "backend/resources/dev-env.edn")
+    (println "Updated .pgpass file"))

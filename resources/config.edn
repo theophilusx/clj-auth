@@ -1,18 +1,19 @@
 {:theophilusx.auth.log/logger
- {:log-file "auth-dev.log"
+ {:log-file  "/tmp/auth-dev.log"
   :log-level :debug}
  :theophilusx.auth.routes/site
- {:name "Default Site Name"
-  :domain-name "localhost:3000"
+ {:name         "Default Site Name"
+  :domain-name  "localhost:3000"
   :web-protocol "http://"
-  :api-prefix "/api"}
+  :api-prefix   "/api"}
  :theophilusx.auth.core/web-server
- {:port 3000
+ {:port  3000
   :join? false
-  :site #ig/ref :theophilusx.auth.routes/site}
+  :site  #ig/ref :theophilusx.auth.routes/site}
  :theophilusx.auth.db/data-source
- {:dbtype "postgres"
+ {:dbtype      "postgres"
   :subprotocol "postgresql"
-  :subname "postgres"}
+  :subname     "postgres"}
  :theophilusx.auth.mail/post
  {:env :dev}}
+

@@ -1,0 +1,13 @@
+#!/usr/bin/env bb
+
+(ns bbrepl
+  (:require [babashka.fs :as fs]
+            [babashka.nrepl.server :as srv]))
+
+(do (srv/start-server! {:host "localhost"
+                        :port 1339})
+    (spit ".nrepl-port" "1339")
+    (-> (Runtime/getRuntime)
+        (.addShutdownHook
+         (Thread. (fn [] (fs/delete ".nrepl-port")))))
+    (deref (promise)))
