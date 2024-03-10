@@ -18,4 +18,4 @@ pom.xml.asc
 .rebel_readline_history
 .pgpass
 *-env.edn
-
+*.local.edn
