@@ -7,7 +7,7 @@
   (tl/debug "Enabling logging")
   (tl/merge-config! {:min-level [["theophilusx.*" log-level]
                                  ["user" log-level]
-                                 [#{"*"} :info]]
+                                 [#{"*"} :error]]
                      :appenders {:spit (spit-appender {:fname log-file})}}))
 
 ;; (defmethod ig/halt-key! :theophilusx.auth.log/logger [_ _]

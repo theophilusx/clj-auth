@@ -18,13 +18,15 @@
 
 (defn start-system [config]
   (log/info "Starting system")
+  (ig/load-namespaces config)
+  (ig/prep config)
   (ig/init config))
 
 (defn stop-system [system]
   (log/info "Stopping system")
   (ig/halt! system))
 
-(defn -main []
+(defn -main [&argsgg]
   (let [cfg (read-config)]
     (reset! config cfg)
     (reset! system (start-system cfg))))

@@ -1,0 +1,3 @@
+#kaocha/v1
+{:plugins                [:kaocha.plugin/hooks]
+ :kaocha.hooks/post-load [theophilusx.auth.setup/init-system]}

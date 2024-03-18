@@ -4,42 +4,37 @@
             [clojure.string :refer [blank? starts-with?]]
             [java-time.api :as jt]))
 
-(deftest read-env
-  (let [env-file "resources/dev-env.edn"
+(deftest read-edn
+  (let [edn-file "resources/config.local.edn"
         env-keys #{:db-user :db-password :db-name :db-host :db-port :db-password-file
                    :db-script-path :smtp-server :smtp-port :smtp-tls :smtp-user :smtp-password
                    :smtp-from :smtp-dev-address :config-file
                    :jwt-private-key-file :jwt-public-key-file
                    :jwt-key-alg :jwt-passphrase}]
-    (testing "read envrionment settings file"
-      (let [ev (sut/read-env env-file)]
+    (testing "read edn file"
+      (let [ev (sut/read-edn edn-file)]
         (is (map? ev))
         (is (= env-keys (set (keys ev))))))
     (testing "fail to read non-existent envrionment file"
-      (let [ev (sut/read-env "resources/does-not-exist.edn")]
+      (let [ev (sut/read-edn "resources/does-not-exist.edn")]
         (is (nil? ev))))))
 
 (deftest read-config
-  (let [env-file "resources/dev-env.edn"
-        env-data (sut/read-env env-file)
-        cfg-keys #{:theophilusx.auth.log/logger
+  (let [cfg-keys #{:theophilusx.auth.log/logger
                    :theophilusx.auth.routes/site
                    :theophilusx.auth.core/web-server
                    :theophilusx.auth.db/data-source
                    :theophilusx.auth.mail/post
                    :theophilusx.auth.utils/key}]
     (testing "Successfully read system config"
-      (let [cfg (sut/read-config env-data)]
+      (let [cfg (sut/read-config)]
         (is (map? cfg))
         (is (= cfg-keys (set (keys cfg))))
-        (let [db-cfg (:theophilusx.auth.db/data-source cfg)
+        (let [db-cfg  (:theophilusx.auth.db/data-source cfg)
               db-keys #{:user :password :dbname
                         :dbtype :subprotocol :subname}]
           (is (map? db-cfg))
-          (is (= db-keys (set (keys db-cfg)))))))
-    (testing "Handle non-existent config file gracefuly"
-      (let [cfg (sut/read-config {:config-file "does-not-exist"})]
-        (is (nil? cfg))))))
+          (is (= db-keys (set (keys db-cfg)))))))))
 
 (deftest map->str
   (let [m {:key1 "value1"
@@ -69,7 +64,7 @@
 (deftest jwt-sign
   (testing "Basic signing of payload"
     (let [token (sut/jwt-sign {:payuload "This is the payload"})]
-      (is (not (nil? token)))
+      (is (some? token))
       (is (string? token))
       (is (= 410 (count token))))))
 

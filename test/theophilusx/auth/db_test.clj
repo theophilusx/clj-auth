@@ -5,12 +5,12 @@
 (deftest get-user-with-email
   (testing "Get known user with email"
     (let [email "john@example.com"
-          rslt (sut/get-user-with-email email)]
+          rslt  (sut/get-user-with-email email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
-      (is (not (nil? (:result rslt))))
+      (is (some? (:result rslt)))
       (is (contains? (:result rslt) :user_id))
       (is (number? (get-in rslt [:result :user_id])))
       (is (= 1 (get-in rslt [:result :user_id])))
@@ -30,17 +30,17 @@
       (is (contains? rslt :result))
       (is (= :error (:status rslt)))
       (is (nil? (:result rslt)))
-      (is (not (nil? (:error-code rslt)))))))
+      (is (some? (:error-code rslt))))))
 
 (deftest get-user-with-id
   (testing "Get known user with user id"
-    (let [id 1
+    (let [id   1
           rslt (sut/get-user-with-id id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
-      (is (not (nil? (:result rslt))))
+      (is (some? (:result rslt)))
       (is (contains? (:result rslt) :user_id))
       (is (number? (get-in rslt [:result :user_id])))
       (is (= id (get-in rslt [:result :user_id])))
@@ -60,7 +60,7 @@
       (is (contains? rslt :result))
       (is (= :error (:status rslt)))
       (is (nil? (:result rslt)))
-      (is (not (nil? (:error-code rslt)))))))
+      (is (some? (:error-code rslt))))))
 
 (deftest add-user
   (testing "Add new user"
@@ -69,10 +69,10 @@
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
-      (is (not (nil? (:result rslt))))
+      (is (some? (:result rslt)))
       (is (contains? (:result rslt) :user_id))
       (is (number? (get-in rslt [:result :user_id])))
-      (is (<  0 (get-in rslt [:result :user_id])))
+      (is (pos? (get-in rslt [:result :user_id])))
       (is (contains? (:result rslt) :email))
       (is (= "fred@example.com" (get-in rslt [:result :email])))
       (is (contains? (:result rslt) :first_name))
@@ -89,7 +89,7 @@
       (is (contains? rslt :result))
       (is (= :error (:status rslt)))
       (is (nil? (:result rslt)))
-      (is (not (nil? (:error-code rslt))))
+      (is (some? (:error-code rslt)))
       (is (= :error (:status rslt)))
       (is (= "23505" (:error-code rslt))))))
 
@@ -180,7 +180,7 @@
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
-      (is (not (nil? (:result rslt))))
+      (is (some? (:result rslt)))
       (is (contains? (:result rslt) :email))
       (is (= "fred@example.com" (get-in rslt [:result :email])))))
   (testing "Delete non-existing user given email."
@@ -197,12 +197,12 @@
                                         "Peter" "Dutton"
                                         "I'm a wanker")
                           [:result :user_id])
-          rslt (sut/delete-user-with-id user-id)]
+          rslt    (sut/delete-user-with-id user-id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
-      (is (not (nil? (:result rslt))))
+      (is (some? (:result rslt)))
       (is (contains? (:result rslt) :email))
       (is (= "pdutton@voldamort.com" (get-in rslt [:result :email])))))
   (testing "Delete non-existing user given user id."
@@ -251,10 +251,10 @@
 (deftest get-request-record
   (testing "Retrieve request record given user ID and request key"
     (let [user-id 1
-          key (str (random-uuid))
-          rslt1 (sut/add-request-record user-id key "confirm")]
+          key     (str (random-uuid))
+          rslt1   (sut/add-request-record user-id key "confirm")]
       (is (= :ok (:status rslt1)))
-      (if (= :ok (:status rslt1))
+      (when (= :ok (:status rslt1))
         (let [rslt2 (sut/get-request-record user-id key)]
           (is (map? rslt2))
           (is (contains? rslt2 :status))
@@ -271,12 +271,12 @@
       (is (map? rslt))
       (is (= :ok (:status rslt)))
       (is (:result rslt))
-      (is (< 0 (count (:result rslt))))))
+      (is (pos? (count (:result rslt))))))
   (testing "Returns empty result for non-existing user ID requests"
     (let [rslt (sut/get-open-user-requests -1)]
       (is (map? rslt))
       (is (= :ok (:status rslt)))
-      (is (= 0 (count (:result rslt)))))))
+      (is (zero? (count (:result rslt)))))))
 
 (deftest complete-request-record
   (testing "Complete open request record"

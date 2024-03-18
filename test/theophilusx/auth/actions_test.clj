@@ -35,14 +35,14 @@
   (let [email "barney@example.com"
         fname "Barney"
         lname "Rubble"
-        pwd "Barney's secret"]
+        pwd   "Barney's secret"]
     (testing "Create new ID"
       (let [rslt (sut/create-id email fname lname pwd)]
         (is (map? rslt))
         (is (contains? rslt :status))
         (is (contains? rslt :result))
         (is (= :ok (:status rslt)))
-        (is (not (nil? (:result rslt))))
+        (is (some? (:result rslt)))
         (is (contains? (:result rslt) :email))
         (is (contains? (:result rslt) :state))
         (is (= email (get-in rslt [:result :email])))

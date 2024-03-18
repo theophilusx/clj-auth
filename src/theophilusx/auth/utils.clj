@@ -10,12 +10,12 @@
 (def key-info (atom nil))
 
 (defmethod  ig/init-key :theophilusx.auth.utils/key
-  [_ {:keys                                                                                                                     [jwt-private-key-file jwt-public-key-file
-                                                                                                    jwt-passphrase jwt-key-alg] :as config}]
+  [_ {:keys                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 [jwt-private-key-file jwt-public-key-file
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                jwt-passphrase jwt-key-alg] :as config}]
   (log/debug "utils/keys: config " config)
-  (let [priv-key-data (if jwt-private-key-file
+  (let [priv-key-data (when jwt-private-key-file
                         (bkeys/private-key jwt-private-key-file jwt-passphrase))
-        pub-key-data  (if jwt-public-key-file
+        pub-key-data  (when jwt-public-key-file
                         (bkeys/public-key jwt-public-key-file))]
     (reset! key-info {:private-key priv-key-data
                       :public-key  pub-key-data
@@ -29,7 +29,7 @@
     (ig/read-string (slurp edn-file))
     (catch Exception e
       (log/error (str "read-edn: " (.getMessage e)))
-      {})))
+      nil)))
 
 (defn read-config
   "Load the integrant system config file."
@@ -59,20 +59,19 @@
                   :theophilusx.auth.utils/key      utils-cfg}))
     (catch Exception e
       (log/error "read-config: " (.getMessage e))
-      {})))
+      nil)))
 
 (defn map->str
   "Convert a map to a string."
   [m]
-  (let [s (into []
-                (for [k (keys m)]
-                  (str k "\t\t: " (get m k))))]
+  (let [s (vec (for [k (keys m)]
+                 (str k "\t\t: " (get m k))))]
     (join "\n" s)))
 
 (defn hash-pwd
-  "Generate hash of password."
-  [pwd]
-  (hashers/derive (or pwd (.toString (random-uuid))) {:alg :bcrypt+blake2b-512}))
+"Generate hash of password."
+[pwd]
+(hashers/derive (or pwd (str (random-uuid))) {:alg :bcrypt+blake2b-512}))
 
 (defn verify-pwd
   "Verify supplied pwd same as recorded pwd.
@@ -85,14 +84,14 @@
   (hashers/verify supplied-pwd recorded-pwd))
 
 (defn jwt-sign
-  ([payload]
-   (jwt-sign payload {}))
-  ([payload opts]
-   (try 
-     (jwt/sign payload (:private-key @key-info) (merge opts {:alg (:alg @key-info)}))
-     (catch Exception e
-       (log/error (str "jwt-sign: " (.getMessage e)))
-       nil))))
+([payload]
+ (jwt-sign payload {}))
+([payload opts]
+ (try 
+   (jwt/sign payload (:private-key @key-info) (merge opts {:alg (:alg @key-info)}))
+   (catch Exception e
+     (log/error (str "jwt-sign: " (.getMessage e)))
+     nil))))
 
 (defn jwt-verify
   ([token]
@@ -107,11 +106,11 @@
       :status :ok}
      (catch Exception e
        (let [e-data (ex-data e)]
-         {:status :error
-          :error-msg (.getMessage e)
+         {:status     :error
+          :error-msg  (.getMessage e)
           :error-name (:type e-data)
           :error-code (:cause e-data)
-          :claims nil})))))
+          :claims     nil})))))
 
 (comment
   (let [e-data ]))

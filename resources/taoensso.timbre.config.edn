@@ -1,6 +1,6 @@
-{:min-level [["theophilusx.*" :debug]
-             ["user" :debug]
-             [#{"*"} :info]]
+{:min-level [["theophilusx.*" :info]
+             ["user" :info]
+             [#{"*"} :error]]
  :appenders {:println (println-appender {:stream :auto})}}
 
 
