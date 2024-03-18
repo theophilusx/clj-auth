@@ -1,21 +1,27 @@
 (ns theophilusx.auth.log
-  (:require [integrant.core :as ig]
-            [taoensso.timbre :as tl]
-            [taoensso.timbre.appenders.core :refer [spit-appender]]))
+  (:require [taoensso.timbre :as timbre]))
 
-(defmethod ig/init-key :theophilusx.auth.log/logger [_ {:keys [log-file log-level]}]
-  (tl/debug "Enabling logging")
-  (tl/merge-config! {:min-level [["theophilusx.*" log-level]
-                                 ["user" log-level]
-                                 [#{"*"} :error]]
-                     :appenders {:spit (spit-appender {:fname log-file})}}))
+(defmacro debug [& args]
+  (timbre/keep-callsite `(timbre/log! :debug :p ~args)))
 
-;; (defmethod ig/halt-key! :theophilusx.auth.log/logger [_ _]
-;;   (log/debug "Disabling logging")
-;;   (log/merge-config! {:appenders {:spit {:enabled? false}}})create)
+(defmacro error [& args]
+  (timbre/keep-callsite `(timbre/log! :error :p ~args)))
 
-(defn record-problem [fn-name fn-call error & {:keys [data] :or {data ""}}]
-  (error (str fn-name " after calling: " fn-call " error: " error " " data)))
+(defmacro fatal [& args]
+  (timbre/keep-callsite `(timbre/log! :fatal :p ~args)))
 
+(defmacro info [& args]
+  (timbre/keep-callsite `(timbre/log! :info :p ~args)))
 
+(defmacro trace [& args]
+  (timbre/keep-callsite `(timbre/log! :trace :p ~args)))
+
+(defmacro warn [& args]
+  (timbre/keep-callsite `(timbre/log! :warn :p ~args)))
+
+(defn set-min-level [lvl]
+  (timbre/set-min-level! lvl))
+
+(defn set-ns-min-level [ns lvl]
+  (timbre/set-ns-min-level! ns lvl))
 

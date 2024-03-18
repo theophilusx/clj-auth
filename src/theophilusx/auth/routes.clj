@@ -1,21 +1,20 @@
 (ns theophilusx.auth.routes
-  (:require
-   [muuntaja.core :as m]
-   [reitit.ring :as ring]
-   [reitit.http :as http]
-   [reitit.http.coercion :as coercion]
-   [reitit.coercion.schema]
-   [schema.core :as s]
-   [reitit.interceptor.sieppari :as sieppari]
-   [reitit.http.interceptors.parameters :as parameters]
-   [reitit.http.interceptors.dev :as dev]
-   [reitit.http.interceptors.muuntaja :as muuntaja]
-   [reitit.http.interceptors.exception :as exception]
-   [reitit.http.interceptors.multipart :as multipart]
-   [theophilusx.auth.handlers :refer [not-implemented
-                                      create confirm]]
-   [integrant.core :as ig]
-   [taoensso.timbre :as log]))
+  (:require [muuntaja.core :as m]
+            [reitit.ring :as ring]
+            [reitit.http :as http]
+            [reitit.http.coercion :as coercion]
+            [reitit.coercion.schema]
+            [schema.core :as s]
+            [reitit.interceptor.sieppari :as sieppari]
+            [reitit.http.interceptors.parameters :as parameters]
+            [reitit.http.interceptors.dev :as dev]
+            [reitit.http.interceptors.muuntaja :as muuntaja]
+            [reitit.http.interceptors.exception :as exception]
+            [reitit.http.interceptors.multipart :as multipart]
+            [theophilusx.auth.handlers :refer [not-implemented
+                                               create confirm]]
+            [integrant.core :as ig]
+            [theophilusx.auth.log :as log]))
 
 (def routes
   ["/api" {:name "Auth API"}

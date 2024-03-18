@@ -5,7 +5,7 @@
             [next.jdbc.types :as types]
             [honey.sql :as sql]
             [honey.sql.helpers :as h]
-            [taoensso.timbre :as log]
+            [theophilusx.auth.log :as log]
             [integrant.core :as ig])
   (:import [java.sql SQLException]
            (com.mchange.v2.c3p0 ComboPooledDataSource)))

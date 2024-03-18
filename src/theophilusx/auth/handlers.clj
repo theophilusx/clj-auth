@@ -1,5 +1,5 @@
 (ns theophilusx.auth.handlers
-  (:require [taoensso.timbre :as log]
+  (:require [theophilusx.auth.log :as log]
             [theophilusx.auth.utils :refer [map->str]]
             [theophilusx.auth.actions :refer [create-id verify-id]]
             [theophilusx.auth.db :refer [get-message]]))

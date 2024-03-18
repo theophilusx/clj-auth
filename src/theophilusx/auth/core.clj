@@ -1,6 +1,6 @@
 (ns theophilusx.auth.core
   (:require [theophilusx.auth.utils :refer [read-config]]
-            [taoensso.timbre :as log]
+            [theophilusx.auth.log :as log]
             [integrant.core :as ig]
             [ring.adapter.jetty :refer [run-jetty]]))
 

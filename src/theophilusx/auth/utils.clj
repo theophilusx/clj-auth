@@ -1,7 +1,7 @@
 (ns theophilusx.auth.utils
   (:require [clojure.edn :as edn]
             [clojure.string :refer [join]]
-            [taoensso.timbre :as log]
+            [theophilusx.auth.log :as log]
             [buddy.core.keys :as bkeys]
             [buddy.hashers :as hashers]
             [buddy.sign.jwt :as jwt]

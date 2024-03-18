@@ -1,5 +1,5 @@
 (ns theophilusx.auth.actions
-  (:require [taoensso.timbre :as log]
+  (:require [theophilusx.auth.log :as log]
             [theophilusx.auth.db :as db]
             [theophilusx.auth.mail :as mail]
             [theophilusx.auth.utils :as utils]

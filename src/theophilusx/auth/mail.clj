@@ -2,7 +2,7 @@
   (:require [postal.core :as post]
             [integrant.core :as ig]
             [hiccup.page :refer [html5]]
-            [taoensso.timbre :as log]))
+            [theophilusx.auth.log :as log]))
 
 (def smtp-server (atom {}))
 

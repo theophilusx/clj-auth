@@ -1,6 +1,6 @@
 (ns user
   (:require [integrant.core :as ig]
-            [taoensso.timbre :as log]
+            [theophilusx.auth.log :as log]
             [theophilusx.auth.core :refer [config system]]
             [theophilusx.auth.utils :refer [read-config]]
             [integrant.repl :refer [go halt reset]]

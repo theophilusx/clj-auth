@@ -1,7 +1,4 @@
-{:theophilusx.auth.log/logger
- {:log-file  "/tmp/auth-dev.log"
-  :log-level :debug}
- :theophilusx.auth.routes/site
+{:theophilusx.auth.routes/site
  {:name         "Default Site Name"
   :domain-name  "localhost:3000"
   :web-protocol "http://"
