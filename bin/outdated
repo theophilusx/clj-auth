@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-clojure -T:outdated
+clojure -Tantq outdated 
 
 

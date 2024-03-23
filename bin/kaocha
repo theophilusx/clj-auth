@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-clojure -M:test "$@"
+clojure -M:test:kaocha "$@"
 

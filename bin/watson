@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+clojure -Tclj-watson scan :deps-edn-path '"deps.edn"' :output '"stdout"'
