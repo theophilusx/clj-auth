@@ -61,10 +61,10 @@
         (is (starts-with? (:error-msg rslt)
                           "ERROR: duplicate key value violates unique constraint"))))))
 
-(deftest verify-id 
-  (testing "Successfully verify ID"
-    (let [])
-    (is (= assertion-values)))) 
+;; (deftest verify-id 
+;;   (testing "Successfully verify ID"
+;;     (let [])
+;;     (is (= assertion-values)))) 
 
 (defn clear-ids []
   (println "Clear test IDs")

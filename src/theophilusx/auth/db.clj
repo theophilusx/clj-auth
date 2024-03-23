@@ -238,18 +238,18 @@
   (log/debug (str "execute: SQL = " sql))
   (try
     (let [rslt (jdbc/execute! @database sql {:return-keys true
-                                             :builder-fn rs/as-unqualified-maps})]
+                                             :builder-fn  rs/as-unqualified-maps})]
       {:status :ok
        :result rslt})
     (catch SQLException e
-      (log/error (str "execute: Error = " (.getMessage e)))
+      (log/error (str "execute: " (.getMessage e)))
       (let [error-data (error-state->code (.getSQLState e))]
-        {:status :error
-         :error-msg (.getMessage e)
+        {:status     :error
+         :error-msg  (.getMessage e)
          :error-name (:error error-data)
          :error-code (:value error-data)
-         :sql sql
-         :result nil}))))
+         :sql        sql
+         :result     nil}))))
 
 (defn execute-one
   "Execute an SQL statement, expecting a single row result- Returns a map with
@@ -261,18 +261,18 @@
   (log/debug (str "execute-one: SQL = " sql))
   (try
     (let [rslt (jdbc/execute-one! @database sql {:return-keys true
-                                                 :builder-fn rs/as-unqualified-maps})]
+                                                 :builder-fn  rs/as-unqualified-maps})]
       {:status :ok
        :result rslt})
     (catch SQLException e
-      (log/error (str "execute-one: Error = " (.getMessage e)))
+      (log/error (str "execute-one: " (.getMessage e)))
       (let [error-data (error-state->code (.getSQLState e))]
-        {:status :error
-         :error-msg (.getMessage e)
+        {:status     :error
+         :error-msg  (.getMessage e)
          :error-name (:error error-data)
          :error-code (:value error-data)
-         :sql sql
-         :result nil}))))
+         :sql        sql
+         :result     nil}))))
 
 (defn connection-ok?
   "Simple test of database connection."

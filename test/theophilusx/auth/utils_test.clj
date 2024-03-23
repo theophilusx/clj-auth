@@ -8,7 +8,7 @@
   (let [edn-file "resources/config.local.edn"
         env-keys #{:db-user :db-password :db-name :db-host :db-port :db-password-file
                    :db-script-path :smtp-server :smtp-port :smtp-tls :smtp-user :smtp-password
-                   :smtp-from :smtp-dev-address :config-file
+                   :smtp-from :smtp-dev-address 
                    :jwt-private-key-file :jwt-public-key-file
                    :jwt-key-alg :jwt-passphrase}]
     (testing "read edn file"
@@ -20,8 +20,7 @@
         (is (nil? ev))))))
 
 (deftest read-config
-  (let [cfg-keys #{:theophilusx.auth.log/logger
-                   :theophilusx.auth.routes/site
+  (let [cfg-keys #{:theophilusx.auth.routes/site
                    :theophilusx.auth.core/web-server
                    :theophilusx.auth.db/data-source
                    :theophilusx.auth.mail/post

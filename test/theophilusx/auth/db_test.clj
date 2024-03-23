@@ -1,5 +1,5 @@
 (ns theophilusx.auth.db-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [clojure.test :refer :all]
             [theophilusx.auth.db :as sut]))
 
 (deftest get-user-with-email
@@ -96,7 +96,7 @@
 (deftest set-user-status-with-email
   (testing "Set user status to confirmed."
     (let [email "john@example.com"
-          rslt (sut/set-user-status-with-email :confirmed email)]
+          rslt  (sut/set-user-status-with-email :confirmed email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -106,7 +106,7 @@
       (is (= email (get-in rslt [:result :email])))))
   (testing "Set user status to locked"
     (let [email "jane@example.com"
-          rslt (sut/set-user-status-with-email :locked email)]
+          rslt  (sut/set-user-status-with-email :locked email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -116,7 +116,7 @@
       (is (= email (get-in rslt [:result :email])))))
   (testing "Set user status to contact"
     (let [email "bobby@example.com"
-          rslt (sut/set-user-status-with-email :contact email)]
+          rslt  (sut/set-user-status-with-email :contact email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -126,7 +126,7 @@
       (is (= email (get-in rslt [:result :email])))))
   (testing "Setting non-existent user status returns nil"
     (let [email "not-exist@nowhere.com"
-          rslt (sut/set-user-status-with-email :archive email)]
+          rslt  (sut/set-user-status-with-email :archive email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -135,7 +135,7 @@
 
 (deftest set-user-status-with-id
   (testing "Set user status to confirmed."
-    (let [id 1
+    (let [id   1
           rslt (sut/set-user-status-with-id :confirmed id)]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -145,7 +145,7 @@
       (is (= "confirmed" (get-in rslt [:result :id_status])))
       (is (= id (get-in rslt [:result :user_id])))))
   (testing "Set user status to locked"
-    (let [id 2
+    (let [id   2
           rslt (sut/set-user-status-with-id :locked id)]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -155,7 +155,7 @@
       (is (= "locked" (get-in rslt [:result :id_status])))
       (is (= id (get-in rslt [:result :user_id])))))
   (testing "Set user status to contact"
-    (let [id 3
+    (let [id   3
           rslt (sut/set-user-status-with-id :contact id)]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -165,7 +165,7 @@
       (is (= "contact" (get-in rslt [:result :id_status])))
       (is (= id (get-in rslt [:result :user_id])))))
   (testing "Setting non-existent user status returns nil"
-    (let [id 0
+    (let [id   0
           rslt (sut/set-user-status-with-email :archive id)]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -215,7 +215,7 @@
 
 (deftest add-request-record
   (testing "Add confirm request record for user."
-    (let [key (str (random-uuid))
+    (let [key  (str (random-uuid))
           rslt (sut/add-request-record 1 key "confirm")]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -226,7 +226,7 @@
       (is (= key (get-in rslt [:result :req_key])))
       (is (= "confirm" (get-in rslt [:result :req_type])))))
   (testing "Add recover request record for user."
-    (let [key (str (random-uuid))
+    (let [key  (str (random-uuid))
           rslt (sut/add-request-record 2 key "recover")]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -237,7 +237,7 @@
       (is (= key (get-in rslt [:result :req_key])))
       (is (= "recover" (get-in rslt [:result :req_type])))))
   (testing "Add recover request record for user."
-    (let [key (str (random-uuid))
+    (let [key  (str (random-uuid))
           rslt (sut/add-request-record 3 key "archive")]
       (is (map? rslt))
       (is (contains? rslt :status))
@@ -281,7 +281,7 @@
 (deftest complete-request-record
   (testing "Complete open request record"
     (let [{:keys [user_id req_key]} (first (:result (sut/get-open-user-requests 1)))
-          rslt (sut/complete-request-record user_id req_key)]
+          rslt                      (sut/complete-request-record user_id req_key)]
       (is (map? rslt))
       (is (= :ok (:status rslt)))
       (is (= user_id (:user_id (:result rslt))))
