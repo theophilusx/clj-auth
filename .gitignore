@@ -19,3 +19,4 @@ pom.xml.asc
 .pgpass
 *-env.edn
 *.local.edn
+.eastwood
