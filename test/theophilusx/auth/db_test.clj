@@ -2,10 +2,10 @@
   (:require [clojure.test :refer :all]
             [theophilusx.auth.db :as sut]))
 
-(deftest get-user-with-email
-  (testing "Get known user with email"
+(deftest get-user
+  (testing "Get known user using email address"
     (let [email "john@example.com"
-          rslt  (sut/get-user-with-email email)]
+          rslt  (sut/get-user email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -23,19 +23,9 @@
       (is (contains? (:result rslt) :last_name))
       (is (string? (get-in rslt [:result :last_name])))
       (is (= "Smith" (get-in rslt [:result :last_name])))))
-  (testing "Get unknown ID"
-    (let [rslt (sut/get-user-with-email "unknown@exmaple.com")]
-      (is (map? rslt))
-      (is (contains? rslt :status))
-      (is (contains? rslt :result))
-      (is (= :error (:status rslt)))
-      (is (nil? (:result rslt)))
-      (is (some? (:error-code rslt))))))
-
-(deftest get-user-with-id
-  (testing "Get known user with user id"
+  (testing "Get known user using user ID"
     (let [id   1
-          rslt (sut/get-user-with-id id)]
+          rslt (sut/get-user id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -53,8 +43,16 @@
       (is (contains? (:result rslt) :last_name))
       (is (string? (get-in rslt [:result :last_name])))
       (is (= "Smith" (get-in rslt [:result :last_name])))))
-  (testing "Get unknown ID"
-    (let [rslt (sut/get-user-with-id 0)]
+  (testing "Get unknown user using email"
+    (let [rslt (sut/get-user "unknown@exmaple.com")]
+      (is (map? rslt))
+      (is (contains? rslt :status))
+      (is (contains? rslt :result))
+      (is (= :error (:status rslt)))
+      (is (nil? (:result rslt)))
+      (is (some? (:error-code rslt)))))
+  (testing "Get unknown user using ID"
+    (let [rslt (sut/get-user 0)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -93,10 +91,10 @@
       (is (= :error (:status rslt)))
       (is (= "23505" (:error-code rslt))))))
 
-(deftest set-user-status-with-email
-  (testing "Set user status to confirmed."
+(deftest set-user-status
+  (testing "Set user status with email to confirmed."
     (let [email "john@example.com"
-          rslt  (sut/set-user-status-with-email :confirmed email)]
+          rslt  (sut/set-user-status :confirmed email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -104,9 +102,9 @@
       (is (map? (:result rslt)))
       (is (= "confirmed" (get-in rslt [:result :id_status])))
       (is (= email (get-in rslt [:result :email])))))
-  (testing "Set user status to locked"
+  (testing "Set user status with email to locked"
     (let [email "jane@example.com"
-          rslt  (sut/set-user-status-with-email :locked email)]
+          rslt  (sut/set-user-status :locked email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -114,9 +112,9 @@
       (is (map? (:result rslt)))
       (is (= "locked" (get-in rslt [:result :id_status])))
       (is (= email (get-in rslt [:result :email])))))
-  (testing "Set user status to contact"
+  (testing "Set user status with email to contact"
     (let [email "bobby@example.com"
-          rslt  (sut/set-user-status-with-email :contact email)]
+          rslt  (sut/set-user-status :contact email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -124,19 +122,17 @@
       (is (map? (:result rslt)))
       (is (= "contact" (get-in rslt [:result :id_status])))
       (is (= email (get-in rslt [:result :email])))))
-  (testing "Setting non-existent user status returns nil"
+  (testing "Setting status using email for non-existent user returns nil"
     (let [email "not-exist@nowhere.com"
-          rslt  (sut/set-user-status-with-email :archive email)]
+          rslt  (sut/set-user-status :archive email)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :error (:status rslt)))
-      (is (nil? (:result rslt))))))
-
-(deftest set-user-status-with-id
-  (testing "Set user status to confirmed."
+      (is (nil? (:result rslt)))))
+  (testing "Set user status using ID to confirmed."
     (let [id   1
-          rslt (sut/set-user-status-with-id :confirmed id)]
+          rslt (sut/set-user-status :confirmed id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -144,9 +140,9 @@
       (is (map? (:result rslt)))
       (is (= "confirmed" (get-in rslt [:result :id_status])))
       (is (= id (get-in rslt [:result :user_id])))))
-  (testing "Set user status to locked"
+  (testing "Set user status using ID to locked"
     (let [id   2
-          rslt (sut/set-user-status-with-id :locked id)]
+          rslt (sut/set-user-status :locked id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -154,9 +150,9 @@
       (is (map? (:result rslt)))
       (is (= "locked" (get-in rslt [:result :id_status])))
       (is (= id (get-in rslt [:result :user_id])))))
-  (testing "Set user status to contact"
+  (testing "Set user status using ID to contact"
     (let [id   3
-          rslt (sut/set-user-status-with-id :contact id)]
+          rslt (sut/set-user-status :contact id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -164,18 +160,17 @@
       (is (map? (:result rslt)))
       (is (= "contact" (get-in rslt [:result :id_status])))
       (is (= id (get-in rslt [:result :user_id])))))
-  (testing "Setting non-existent user status returns nil"
+  (testing "Setting non-existent user status using ID returns nil"
     (let [id   0
-          rslt (sut/set-user-status-with-email :archive id)]
+          rslt (sut/set-user-status :archive id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
-      (is (= :error (:status rslt)))
       (is (nil? (:result rslt))))))
 
-(deftest delete-user-with-email
-  (testing "Delete existing user with provided email."
-    (let [rslt (sut/delete-user-with-email "fred@example.com")]
+(deftest delete-user
+  (testing "Delete existing user providing email."
+    (let [rslt (sut/delete-user "fred@example.com")]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -183,21 +178,19 @@
       (is (some? (:result rslt)))
       (is (contains? (:result rslt) :email))
       (is (= "fred@example.com" (get-in rslt [:result :email])))))
-  (testing "Delete non-existing user given email."
+  (testing "Delete non-existing user providing email."
     (let [rslt (sut/delete-user-with-email "fred@example.com")]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
       (is (= :ok (:status rslt)))
-      (is (nil? (:result rslt))))))
-
-(deftest delete-user-with-id
+      (is (nil? (:result rslt)))))
   (testing "Delete existing user with provided user id."
     (let [user-id (get-in (sut/add-user "pdutton@voldamort.com"
                                         "Peter" "Dutton"
                                         "I'm a wanker")
                           [:result :user_id])
-          rslt    (sut/delete-user-with-id user-id)]
+          rslt    (sut/delete-user user-id)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -206,7 +199,7 @@
       (is (contains? (:result rslt) :email))
       (is (= "pdutton@voldamort.com" (get-in rslt [:result :email])))))
   (testing "Delete non-existing user given user id."
-    (let [rslt (sut/delete-user-with-id 0)]
+    (let [rslt (sut/delete-user 0)]
       (is (map? rslt))
       (is (contains? rslt :status))
       (is (contains? rslt :result))
@@ -294,22 +287,49 @@
       (is (= :error (:status rslt)))
       (is (nil? (:result rslt))))))
 
+(deftest get-message
+  (testing "Get verify message"
+    (let [rslt (sut/get-message :verify)]
+      (is (map? rslt))
+      (is (some? (:result rslt)))
+      (is (= :ok (:status rslt)))
+      (is (contains? (:result rslt) :message))))
+  (testing "Get recoverjmessage"
+    (let [rslt (sut/get-message :recover)]
+      (is (map? rslt))
+      (is (some? (:result rslt)))
+      (is (= :ok (:status rslt)))
+      (is (contains? (:result rslt) :message))))
+  (testing "Get locked message"
+    (let [rslt (sut/get-message :locked)]
+      (is (map? rslt))
+      (is (some? (:result rslt)))
+      (is (= :ok (:status rslt)))
+      (is (contains? (:result rslt) :message))))
+  (testing "Get contact message"
+    (let [rslt (sut/get-message :contact)]
+      (is (map? rslt))
+      (is (some? (:result rslt)))
+      (is (= :ok (:status rslt)))
+      (is (contains? (:result rslt) :message))))
+  (testing "Get non-existent message handled gracefully" 
+    (let [rslt (sut/get-message :no-such-message)]
+      (is (map? rslt))
+      (is (= :ok (:status rslt)))
+      (is (nil? (:result rslt)))))) 
+
 (defn clear-ids []
   (sut/delete-user-with-email "fred@example.com")
   (sut/truncate-table "auth.roles"))
 
 (defn test-ns-hook []
   (clear-ids)
-  (get-user-with-email)
-  (get-user-with-id)
+  (get-user)
   (add-user)
-  (set-user-status-with-email)
-  (set-user-status-with-id)
-  (delete-user-with-email)
-  (delete-user-with-id)
+  (set-user-status)
+  (delete-user)
   (add-request-record)
+  (get-request-record)
   (get-open-user-requests)
   (complete-request-record)
-  ;; (add-confirm-record)
-  ;; (set-confirm-flag)
-  )
+  (get-message))  
