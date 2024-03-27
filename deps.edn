@@ -45,6 +45,7 @@
                          org.clojars.philoskim/kaocha-test-ns-hook {:mvn/version "0.3.0"}}
             :main-opts  ["-m" "kaocha.runner"]}
            :test
-           {:extra-paths ["test"]}}}
+           {:extra-paths ["test"]
+            :extra-deps  {org.clojure/test.check {:mvn/version "1.1.1"}}}}}
 
 
