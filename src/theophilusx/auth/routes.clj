@@ -17,27 +17,30 @@
             [theophilusx.auth.log :as log]))
 
 (def routes
-  ["/api" {:name "Auth API"}
-   ["/create"
-    {:name "Create new account"
-     :post {:handler create
-            :parameters {:body {:email s/Str
-                                :first-name s/Str
-                                :last-name s/Str
-                                :password s/Str}}}
-     :coercion reitit.coercion.schema/coercion}]
-   ["/confirm/:user-id/:key"
-    {:name "Confirm account creation request"
-     :get {:parameters {:path {:user-id s/Int
-                               :key s/Str}}
-           :handler confirm}
-     :coercion reitit.coercion.schema/coercion}]
-   ["/authn"
-    {:name "Authenticate"
-     :post {:handler not-implemented
-            :parameters {:body {:email s/Str
-                                :password s/Str}}}
-     :coercion reitit.coercion.schema/coercion}]])
+  ["/"
+   {:name "Login Form"
+    :get  {:handler not-implemented}}
+   ["/api" {:name "Auth API"}
+    ["/create"
+     {:name     "Create new account"
+      :post     {:handler    create
+                 :parameters {:body {:email      s/Str
+                                     :first-name s/Str
+                                     :last-name  s/Str
+                                     :password   s/Str}}}
+      :coercion reitit.coercion.schema/coercion}]
+    ["/confirm/:user-id/:key"
+     {:name     "Confirm account creation request"
+      :get      {:parameters {:path {:user-id s/Int
+                                     :key     s/Str}}
+                 :handler    confirm}
+      :coercion reitit.coercion.schema/coercion}]
+    ["/authn"
+     {:name     "Authenticate"
+      :post     {:handler    not-implemented
+                 :parameters {:body {:email    s/Str
+                                     :password s/Str}}}
+      :coercion reitit.coercion.schema/coercion}]]])
 
 (def app
   (http/ring-handler

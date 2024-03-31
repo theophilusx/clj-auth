@@ -21,12 +21,12 @@
 (defn request-confirm-id
   "Generate new verification record and send emil request to verify."
   [email user-id]
-  (let [rslt (create-request-record user-id "confirm")
+  (let [rslt                 (create-request-record user-id :confirm)
         {:keys [domain-name web-protocol
                 api-prefix]} (:theophilusx.auth.routes/site @config)]
     (if (= :ok (:status rslt))
-      (let [link (str web-protocol domain-name api-prefix
-                      "/confirm/" user-id "/" (:vid rslt))
+      (let [link      (str web-protocol domain-name api-prefix
+                           "/confirm/" user-id "/" (:vid rslt))
             mail-rslt (mail/send-confirm-msg email link)]
         (when (not= :ok (:status mail-rslt))
           (log/error "request-confirm-id: Error sending verify request ", mail-rslt))
@@ -58,7 +58,7 @@
   (log/debug (str "verify-id: user-id: " user-id " key: " key " ip: " ip))
   (let [rslt1 (db/complete-request-record user-id key ip)]
     (if (= :ok (:status rslt1))
-      (let [rslt2 (db/set-user-status-with-id "confirmed" user-id)]
+      (let [rslt2 (db/set-user-status :confirm user-id)]
         (when (not= :ok (:status rslt2))
           (log/error "verify-id Result: " rslt2))
         rslt2)
