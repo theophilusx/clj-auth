@@ -20,7 +20,7 @@
     (is (and (string? @sut/dev-address)
              (= "\"Auth Dev Address\" <blind-bat@hotmail.com>" @sut/dev-address)))
     (is (and (string? @sut/smtp-from)
-             (= "\"Auth System\" <theophilusx@gmail.com" @sut/smtp-from)))))
+             (= "\"Authentication System\" <theophilusx@gmail.com" @sut/smtp-from)))))
 
 (deftest confirm-msg-tests
   (testing "Different links"

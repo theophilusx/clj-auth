@@ -162,13 +162,10 @@
                    (h/delete-from :auth.users)
                    (sql/format))]
       (jdbc/with-transaction [tx @database]
-        (let [rs1 (jdbc/execute! tx sql1 {:return-keys true
-                                          :builder-fn  rs/as-unqualified-maps})
-              rs2 (jdbc/execute! tx sql2 {:return-keys true
-                                          :builder-fn  rs/as-unqualified-maps})
-              rs3 (jdbc/execute! tx sql3 {:return-keys true
-                                          :builder-fn  rs/as-unqualified-maps})]
-          rs3)))
+        (let [rs1 (jdbc/execute-one! tx sql1)
+              rs2 (jdbc/execute-one! tx sql2)
+              rs3 (jdbc/execute-one! tx sql3)]
+          {:update-count (:next.jdbc/update-count rs3)})))
     (catch Exception e
       (let [msg (str "delete-user: Failed to remove user " user)]
         (log/error msg e)

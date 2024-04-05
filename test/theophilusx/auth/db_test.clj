@@ -110,21 +110,19 @@
 (deftest delete-user
   (testing "Delete existing user providing email."
     (let [rslt (sut/delete-user "fred@example.com")]
-      (is (= 1 (count rslt)))
-      (is (= "fred@example.com" (:email (first rslt))))))
+      (is (= 1 (:update-count rslt)))))
   (testing "Delete non-existing user providing email."
     (let [rslt (sut/delete-user "fred@example.com")]
-      (is (= 0 (count rslt)))))
+      (is (= 0 (:update-count rslt)))))
   (testing "Delete existing user with provided user id."
     (let [user-id (:user_id (sut/add-user "pdutton@voldamort.com"
                                           "Peter" "Dutton"
                                           "I'm a wanker"))
           rslt    (sut/delete-user user-id)]
-      (is (= 1 (count rslt)))
-      (is (= "pdutton@voldamort.com" (:email (first rslt))))))
+      (is (= 1 (:update-count rslt)))))
   (testing "Delete non-existing user given user id."
     (let [rslt (sut/delete-user 0)]
-      (is (= 0 (count rslt))))))
+      (is (= 0 (:update-count rslt))))))
 
 (deftest add-request-record
   (testing "Add confirm request record for user."
@@ -184,7 +182,6 @@
       (is (:completed rslt))))
   (testing "Completing non-existent record returns empty list"
     (let [rslt (sut/complete-request-record -1 "bad-key")]
-      (println (str "Result: " rslt))
       (is (nil? rslt)))))
 
 (deftest get-message
