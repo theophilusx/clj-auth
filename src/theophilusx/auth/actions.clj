@@ -14,7 +14,7 @@
     (catch Exception e
       (let [msg (str "create-request-record; Failed to add " req-type
                      " for user " user-id)]
-        (log/error msg)
+        (log/error msg e)
         (throw (ex-info msg
                         {:use   user-id
                          :tyupe req-type} e))))))
@@ -36,10 +36,13 @@
         (when (not= :success rs)
           (throw (ex-info (str "Failed to send confirm id to " email)
                           {:mail-result rs})))
-        rs))
+        {:mail-status rs
+         :email       email
+         :user_id     user_id
+         :req_key     req_key}))
     (catch Exception e
       (let [msg (str "request-confirm-id: Failed to generate verify request for user " user)]
-        (log/error msg)
+        (log/error msg e)
         (throw (ex-info msg
                         {:user user} e))))))
 
@@ -50,13 +53,13 @@
     (let [pwd               (utils/hash-pwd password)
           {:keys [user_id]} (db/add-user email first-name last-name pwd)
           rs                (request-confirm-id user_id)]
-      (when (not= :success rs)
+      (when (not= :success (:mail-status rs))
         (throw (ex-info (str "Request confirm ID failed for " email)
                         {:result rs})))
       rs)
     (catch Exception e
       (let [msg (str "create-id: Failed to create ID for " email)]
-        (log/error msg)
+        (log/error msg e)
         (throw (ex-info msg
                         {:email      email
                          :first-name first-name
@@ -72,7 +75,7 @@
     (db/set-user-status :confirm user-id)
     (catch Exception e
       (let [msg (str "verify-id: Failed to mark ID " user-id " as confirmed")]
-        (log/error msg)
+        (log/error msg e)
         (throw (ex-info msg
                         {:user user-id
                          :key  key
