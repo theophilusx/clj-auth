@@ -5,8 +5,7 @@
             [theophilusx.auth.utils :refer [read-config]]
             [integrant.repl :refer [go halt reset]]
             [integrant.repl.state :as rstate]
-            [lambdaisland.launchpad.watcher :refer [watch!]]
-            [kaocha.repl :as k]))
+            [lambdaisland.launchpad.watcher :refer [watch!]]))
 
 (defn reload-config [opts]
   (println opts)
