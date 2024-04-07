@@ -10,7 +10,7 @@
 
 (defn init-system [cfg]
   (log/set-min-level :error)
-  (when (not @config)
+  (when-not @config
     (let [system-cfg (merge (read-config)
                             {:theophilusx.auth.core/web-server
                              {:port  3001

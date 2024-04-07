@@ -113,7 +113,7 @@
       (is (= 1 (:update-count rslt)))))
   (testing "Delete non-existing user providing email."
     (let [rslt (sut/delete-user "fred@example.com")]
-      (is (= 0 (:update-count rslt)))))
+      (is (zero? (:update-count rslt)))))
   (testing "Delete existing user with provided user id."
     (let [user-id (:user_id (sut/add-user "pdutton@voldamort.com"
                                           "Peter" "Dutton"
@@ -122,7 +122,7 @@
       (is (= 1 (:update-count rslt)))))
   (testing "Delete non-existing user given user id."
     (let [rslt (sut/delete-user 0)]
-      (is (= 0 (:update-count rslt))))))
+      (is (zero? (:update-count rslt))))))
 
 (deftest add-request-record
   (testing "Add confirm request record for user."
@@ -170,7 +170,7 @@
       (is (= (count rslt) (count (filter #(false? (:completed %)) rslt))))))
   (testing "Returns empty result for non-existing user ID requests"
     (let [rslt (sut/get-open-user-requests -1)]
-      (is (= 0 (count rslt))))))
+      (is (zero? (count rslt))))))
 
 (deftest complete-request-record
   (testing "Complete open request record"
