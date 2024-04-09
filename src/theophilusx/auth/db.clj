@@ -14,11 +14,13 @@
 (def database (atom nil))
 
 (defmethod ig/init-key :theophilusx.auth.db/data-source [_ config]
+  (log/info "Initialising database")
   (log/debug (str "data-source: Init connection pool. config = " config))
   (reset! database (connection/->pool ComboPooledDataSource config))
   config)
 
 (defmethod ig/halt-key! :theophilusx.auth.db/data-source [_ _]
+  (log/info "Closing database connections")
   (log/debug "data-source: Closing connection pool")
   (.close @database)
   (reset! database nil))

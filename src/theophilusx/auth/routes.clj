@@ -17,9 +17,10 @@
             [theophilusx.auth.log :as log]))
 
 (def routes
-  ["/"
-   {:name "Login Form"
-    :get  {:handler not-implemented}}
+  [["/"
+    [""
+     {:name "Login Form"
+      :get  {:handler not-implemented}}]]
    ["/api" {:name "Auth API"}
     ["/create"
      {:name     "Create new account"
@@ -63,6 +64,7 @@
    {:executor sieppari/executor}))
 
 (defmethod ig/init-key :theophilusx.auth.routes/site [_ config]
+  (log/info "Initialising web routes")
   (log/debug "site-handler: Configuring default site handlers")
   (assoc config :handler #'app))
 

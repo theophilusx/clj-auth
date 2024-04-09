@@ -13,9 +13,10 @@
 (def dev-address (atom "no-reply@bogus.site"))
 
 (defmethod ig/init-key :theophilusx.auth.mail/post [_ config]
+  (log/info "Initialising mail system")
   (let [svr {:host (:host config)
              :port (:port config)
-             :tls (:tls config)
+             :tls  (:tls config)
              :user (:user config)
              :pass (:pass config)}]
     (when (= :prod (:env config))

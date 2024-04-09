@@ -10,8 +10,8 @@
 (def key-info (atom nil))
 
 (defmethod  ig/init-key :theophilusx.auth.utils/key
-  [_ {:keys                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 [jwt-private-key-file jwt-public-key-file
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                jwt-passphrase jwt-key-alg] :as config}]
+  [_ {:keys [jwt-private-key-file jwt-public-key-file jwt-passphrase jwt-key-alg] :as config}]
+  (log/info "Initialising JWT Keys")
   (log/debug "utils/keys: config " config)
   (let [priv-key-data (when jwt-private-key-file
                         (bkeys/private-key jwt-private-key-file jwt-passphrase))
