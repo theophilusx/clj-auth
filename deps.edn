@@ -4,7 +4,7 @@
            metosin/reitit                      {:mvn/version "0.6.0"}
            metosin/muuntaja                    {:mvn/version "0.6.10"}
            integrant/integrant                 {:mvn/version "0.8.1"}
-           hiccup/hiccup                       {:mvn/version "1.0.5"}
+           hiccup/hiccup                       {:mvn/version "2.0.0-RC3"}
            com.taoensso/timbre                 {:mvn/version "6.5.0"}
            com.fzakaria/slf4j-timbre           {:mvn/version "0.4.1"}
            com.mchange/c3p0                    {:mvn/version "0.10.0"}
