@@ -8,7 +8,7 @@
   (testing "Successfully generate request record"
     (let [{:keys [user_id]} (db/get-user "john@example.com")]
       (is (pos? user_id))
-      (let [rslt (sut/create-request-record user_id :confirm)]
+      (let [rslt (sut/create-request-record user_id :confirmed)]
         (is (map? rslt))
         (is (= (set (keys rslt))
                #{:completed_by :req_type :completed :created_dt
@@ -41,6 +41,16 @@
     (testing "Attempt create existing ID"
       (is (thrown? Exception (sut/create-id email fname lname pwd))))))
 
+(deftest verify-id
+  (testing "Successfully verify ID with good key"
+    (let [email                     "john@example.com"
+          {:keys [user_id]}         (db/get-user email)
+          {:keys [user_id req_key]} (sut/create-request-record user_id :confirmed)
+          rs                        (sut/verify-id user_id req_key "127.0.0.1")]
+      (is (map? rs))
+      (is (= email (:email rs)))
+      (is (= "confirmed" (:id_status rs))))))
+
 (defn clear-ids []
   (try
     (println (str "clear-ids: " (db/delete-user "barney@example.com")))
@@ -52,6 +62,7 @@
   (create-request-record)
   (request-confirm-id)
   (clear-ids)
-  (create-id))
+  (create-id)
+  (verify-id))
 
 

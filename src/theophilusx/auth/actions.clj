@@ -72,7 +72,7 @@
   [user-id key ip]
   (try 
     (db/complete-request-record user-id key ip)
-    (db/set-user-status :confirm user-id)
+    (db/set-user-status :confirmed user-id)
     (catch Exception e
       (let [msg (str "verify-id: Failed to mark ID " user-id " as confirmed")]
         (log/error msg e)
