@@ -1,5 +1,5 @@
-{:min-level [["theophilusx.*" :debug]
-             ["user" :debug]
+{:min-level [["theophilusx.*" :info]
+             ["user" :info]
              [#{"*"} :error]]
  :appenders {:println (println-appender {:stream :auto})
              :spit    (spit-appender {:fname "/tmp/clj-auth.log"})}}

@@ -13,7 +13,8 @@
                            :content \"text/html\"}]
                    [:title #tmpl/val :title]
                    [:link {:rel  \"stylesheet\"
-                           :href \"defualt.css\"}]]")
+                           :href \"defualt.css\"}]]
+                   [:script {:src \"https://unpkg.com/htmx.org@1.9.11\"}]")
 
 (defn parse-template
   ([template]
@@ -56,5 +57,6 @@
 
 (comment
   (parse-template "test2.edn") 
-  (render-template "test2.edn") 
+  (render-template "home.edn") 
+  ()
   ) 

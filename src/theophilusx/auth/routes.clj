@@ -11,8 +11,7 @@
             [reitit.http.interceptors.muuntaja :as muuntaja]
             [reitit.http.interceptors.exception :as exception]
             [reitit.http.interceptors.multipart :as multipart]
-            [theophilusx.auth.handlers :refer [not-implemented
-                                               create confirm]]
+            [theophilusx.auth.handlers :refer [not-implemented]]
             [integrant.core :as ig]
             [theophilusx.auth.log :as log]))
 
@@ -24,7 +23,7 @@
    ["/api" {:name "Auth API"}
     ["/create"
      {:name     "Create new account"
-      :post     {:handler    create
+      :post     {:handler    not-implemented
                  :parameters {:body {:email      s/Str
                                      :first-name s/Str
                                      :last-name  s/Str
@@ -34,7 +33,7 @@
      {:name     "Confirm account creation request"
       :get      {:parameters {:path {:user-id s/Int
                                      :key     s/Str}}
-                 :handler    confirm}
+                 :handler    not-implemented}
       :coercion reitit.coercion.schema/coercion}]
     ["/authn"
      {:name     "Authenticate"
