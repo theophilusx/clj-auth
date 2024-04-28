@@ -1,0 +1,22 @@
+[#tmpl/def {:title      "Login"
+            :action-url "http://localhost:3000/api/authn"
+            :register   "http://localhost:3000/api/register"}
+ {:body [:body
+         [:header
+          [:h1 #tmpl/val :title]]
+         [:article
+          [:section
+           [:form {:action #tmpl/val :action-url}
+            [:div
+             [:label {:for "email"} "Email Address"]
+             [:input {:type "text"
+                      :id   "email"
+                      :name "email"}]]
+            [:div
+             [:label {:for "password"} "Password"]
+             [:input {:type "password"
+                      :id   "password"
+                      :name "password"}]]
+            [:div
+             [:button {:type "submit"}]]]]]]}]
+

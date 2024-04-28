@@ -1,0 +1,15 @@
+[#tmpl/def {:title "Not Implemented"}
+ {:body [:body
+         [:header
+          [:h1 #tmpl/val :title]]
+         [:article
+          [:div
+           [:p "The API functionality linked to this URL has not yet been implemented."]]
+          [:div
+           [:ul
+            [:li "URL: " #tmpl/val :uri]
+            [:li "Method: " #tmpl/val :request-method]
+            [:li "Params: " #tmpl/val :params]
+            [:li "Form Params: " #tmpl/val :form-params]
+            [:li "Query Params: " #tmpl/val :query-params]
+            [:li "Path Params: " #tmpl/val :path-params]]]]]}]
